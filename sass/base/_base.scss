@@ -1,0 +1,13 @@
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+}
+
+.main {
+    position: relative;
+    background-image: var(--game-background);
+    height: 100vh;
+    // overflow: hidden;
+}

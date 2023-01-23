@@ -1,0 +1,14 @@
+{
+  "name": "doodle_jump_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "sass:w": "sass --watch sass/main.scss:public/css/style.css"
+  },
+  "author": "Kaneyo",
+  "license": "ISC",
+  "dependencies": {
+    "sass": "^1.57.1"
+  }
+}
