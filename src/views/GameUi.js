@@ -2,9 +2,9 @@ class GameUi {
     main = document.querySelector('.main');
 
     constructor(game, map_width) {
-        this.main.style.width   = map_width + "px";
-        this.game               = game;
-        this.platforms          = [];
+        this.main.style.width = map_width + "px";
+        this.game = game;
+        this.platforms = [];
         this.doodlerElem;
         this.initEventsHandlers();
     }
@@ -19,21 +19,22 @@ class GameUi {
     }
     
     initUi() {
-        this.doodlerElem                = document.createElement('img');
+        this.doodlerElem = document.createElement('img');
         this.doodlerElem.classList.add('doodler');
-        this.doodlerElem.style.width    = this.game.doodler.width + 'px';
-        this.doodlerElem.style.height   = this.game.doodler.height + 'px';
+        this.doodlerElem.style.width = this.game.doodler.width + 'px';
+        this.doodlerElem.style.height = this.game.doodler.height + 'px';
         this.main.append(this.doodlerElem);
     }
 
     createPlatform(platformObj) {
-        let platform                = document.createElement('img');
+        let platform = document.createElement('img');
         this.platforms.push(platform);
         this.main.append(platform);
 
-        platform.style.width        = platformObj.width + 'px';
-        platform.src                = platformObj.skin;
-        platform.style.transform    = `translate(${platformObj.position.x}px, ${platformObj.position.y}px)`;
+        platform.src = platformObj.skin;
+        platform.classList.add('platform');
+        platform.style.height = platformObj.height + 'px';
+        platform.style.transform = `translate(${platformObj.position.x}px, ${platformObj.position.y}px)`;
     }
 
     refreshDoodler() {

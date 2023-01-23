@@ -5,14 +5,6 @@ class Objects {
         this.height     = height;
         this.status;
     }
-
-    // get position() {
-    //     return this.position;
-    // }
-
-    // set position({positionX, positionY}) {
-    //     this.position = {x:positionX, y:positionY};
-    // }
 }
 
 export default Objects;

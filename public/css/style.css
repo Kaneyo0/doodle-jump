@@ -88,11 +88,16 @@ body {
   position: relative;
   background-image: var(--game-background);
   height: 100vh;
+  overflow: hidden;
 }
 
 .doodler {
   position: absolute;
   z-index: 1;
+}
+
+.platform {
+  position: absolute;
 }
 
 /*# sourceMappingURL=style.css.map */
