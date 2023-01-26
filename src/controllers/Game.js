@@ -1,46 +1,39 @@
 import GameUi from "../views/GameUi.js";
 import Map from "../models/Map.js";
+import EventHandler from "./gameControllers/EventHandler.js";
+import CollisionHandler from "./gameControllers/CollisionHandler.js";
+import MovementController from "./gameControllers/MovementController.js";
 import Doodler from "../models/Doodler.js";
 import Platform from "../models/platform.js";
 
 const gameWidth = 800;
+const nbPlatforms = 40;
+const platformBaseYPosition = window.innerHeight - 100;
 
 class Game {
     constructor() {
         this.isPaused = false;
         this.Map = new Map(gameWidth);
         this.GameUi = new GameUi(this, this.Map.width);
+        this.EventHandler = new EventHandler(this);
+        this.CollisionHandler = new CollisionHandler(this);
+        this.MovementController = new MovementController();
         this.doodler = new Doodler(gameWidth/2);
-        this.platforms = [];
-        this.nbPlatforms = 10;
-        this.movementSpeed = 8;
-        console.log(window.innerHeight);
+        this.activePlatforms = [];
+        this.inactivePlatforms = [];
+        this.platformQuantity = 0;
+        this.platformYPosition = platformBaseYPosition;
         this.game = function() {
             if (!this.isPaused) {
-                console.log('game is running');
-                this.testEndGame();
-                this.testCollision();
-                this.jumpDoodler();
-                while (this.platforms.length < this.nbPlatforms) {
-                    let platform = new Platform(gameWidth);
-                    this.platforms.push(platform);
-                    this.GameUi.createPlatform(platform);
-                }
-                if (this.doodler.left) {
-                    this.doodler.position.x -= this.movementSpeed;
-                    
-                }
-                if (this.doodler.right) {
-                    this.doodler.position.x += this.movementSpeed;
-                    
-                }
-                if (this.doodler.position.x - this.doodler.width > gameWidth) {
-                    this.doodler.position.x = 0;
-                }
-                if (this.doodler.position.x + this.doodler.width < 0) {
-                    this.doodler.position.x = gameWidth;
-                }
+                this.createPlatform();
+                this.platformYPosition = this.activePlatforms[this.activePlatforms.length - 1].position.y;
+                this.doodler.horizontalMove();
+                this.doodler.jump();
+                this.CollisionHandler.testCollision();
+                this.controlScreenPosition();
                 this.GameUi.refreshGameUi();
+                this.testPlatformPosition();
+                this.testEndGame();
             }
             window.requestAnimationFrame(()=>{this.game()});
         }
@@ -49,78 +42,78 @@ class Game {
         window.requestAnimationFrame(()=>{this.game()});
     }
 
+    getDoodler() {
+        return this.doodler;
+    }
+
+    getAllPlatforms() {
+        return this.activePlatforms;
+    }
+
+    getPlatformData(idPlatform) {
+        let result = this.activePlatforms.filter(platform => {
+            return platform.id == idPlatform;
+        })
+        return result[0];
+    }
+
     receiveEvent(event) {
-        switch(event.type) {
-            case 'keydown':
-                this.handleKeyPressed(event.key);
-                break;
-            case 'keyup':
-                this.handleKeyReleased(event.key);
-                break;
-        }
+       this.EventHandler.handleEvent(event);
     }
 
-    handleKeyPressed(keyPressed) {
-        switch(keyPressed) {
-            case 'q': 
-                this.startDoodlerMovement(false, 'left');
-                break;
-            case 'd': 
-                this.startDoodlerMovement(true, 'right');
-                break;
-            case 'z':
-                this.doodler.initJump();
-                break;   
-        }
+    togglePause() {
+        this.isPaused = !this.isPaused;
     }
 
-    handleKeyReleased(keyLeft) {
-        switch(keyLeft) {
-            case 'q': 
-                this.doodler.left = false;
-                break;
-            case 'd': 
-                this.doodler.right = false;
-                break;
-            case 'r':
-                this.doodler = new Doodler(gameWidth/2);
-                this.isPaused = false;
-                break;
-            case 'b':
-                this.isPaused = !this.isPaused;
-                break;
-        }
+    restartGame() {
+        this.doodler = new Doodler(gameWidth/2);
+        this.isPaused = false;
     }
 
     startDoodlerMovement(right, direction) {
-        this.doodler.left = !right;
-        this.doodler.right = right;
-        this.doodler.direction  = direction;
+        this.MovementController.startObjectMovement(this.doodler, right, direction);
     }
 
-    jumpDoodler() {
-        this.doodler.jump();
+    stopDoodlerMovement(right) {
+        this.MovementController.stopObjectMovement(this.doodler, right);
     }
 
-    testCollision() {
-        if (!this.doodler.jumping) {
-            if (this.doodler.position.y + this.doodler.height >= window.innerHeight) {
-                this.doodler.initJump();
-            }
-    
-            this.platforms.forEach(platform => {
-                if (this.doodlerIsTouchingObject(platform)) {
-                    this.doodler.initJump();
-                }
+    controlScreenPosition() {
+        if (this.doodler.position.y < window.innerHeight / 3) {
+            this.doodler.move = false;
+            this.activePlatforms.forEach(platform => {
+                platform.position.y += 8;
             });
         }
     }
 
-    doodlerIsTouchingObject(object) {
-        return this.doodler.position.y + this.doodler.height >= object.position.y && 
-               this.doodler.position.x + this.doodler.width >= object.position.x &&
-               object.position.y + object.height >= this.doodler.position.y &&
-               object.position.x + object.width >= this.doodler.position.x
+    jumpDoodler() {
+        this.doodler.initJump();
+    }
+
+    createPlatform() {
+        while (this.activePlatforms.length < nbPlatforms) {
+            let platform = new Platform(this.platformQuantity, gameWidth, this.platformYPosition);
+            this.platformQuantity ++;
+            this.activePlatforms.push(platform);
+            this.platformYPosition = this.activePlatforms[this.activePlatforms.length - 1].position.y - 50;
+            this.GameUi.createPlatform(platform);
+        }
+    }
+
+    recyclePlatform(idPlatform) {
+        let platform = this.getPlatformData(idPlatform);
+        this.inactivePlatforms.push(platform);
+        this.activePlatforms.splice(this.activePlatforms.indexOf(platform), 1);
+        this.GameUi.recyclePlatform(idPlatform);
+    }
+
+    testPlatformPosition() {
+        this.activePlatforms.forEach(platform => {
+            if (platform.position.y > this.doodler.position.y * 8) {
+                this.recyclePlatform(platform.id);
+            }
+        })
     }
 
     testEndGame() {
