@@ -1,6 +1,6 @@
 import Objects from './Objects.js';
 
-const baseVelocity = 15;
+const baseVelocity = 18;
 const doodlerSize = 60;
 
 class Doodle extends Objects {
@@ -11,9 +11,9 @@ class Doodle extends Objects {
         this.right = false;
         this.left = false;
         this.jumping = true;
-        this.movementSpeed = 10;
+        this.movementSpeed = 12;
         this.velocity = baseVelocity;
-        this.gravity = 0.5;
+        this.gravity = 0.7;
     }
 
     initJump() {

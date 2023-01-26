@@ -1,4 +1,4 @@
-const gameWidth = 800;
+const gameWidth = 1200;
 
 class Objects {
     constructor(move, positionX, positionY, width, height) {

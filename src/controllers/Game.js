@@ -6,7 +6,7 @@ import MovementController from "./gameControllers/MovementController.js";
 import Doodler from "../models/Doodler.js";
 import Platform from "../models/platform.js";
 
-const gameWidth = 800;
+const gameWidth = 1200;
 const nbPlatforms = 40;
 const platformBaseYPosition = window.innerHeight - 100;
 
@@ -82,13 +82,23 @@ class Game {
         if (this.doodler.position.y < window.innerHeight / 3) {
             this.doodler.move = false;
             this.activePlatforms.forEach(platform => {
-                platform.position.y += 8;
+                platform.position.y += this.doodler.velocity;
             });
         }
     }
 
     jumpDoodler() {
         this.doodler.initJump();
+    }
+
+    doodlerIsTouching(object) {
+        switch(object.constructor.name) {
+            case 'Platform':
+                if (!object.broken) {
+                    this.jumpDoodler();
+                }
+                break;
+        }
     }
 
     createPlatform() {

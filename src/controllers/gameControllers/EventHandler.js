@@ -6,10 +6,10 @@ class EventHandler {
     handleEvent(event) {
         switch(event.type) {
             case 'keydown':
-                this.handleKeyPressed(event.key);
+                this.handleKeyPressed(event.keyCode);
                 break;
             case 'keyup':
-                this.handleKeyReleased(event.key);
+                this.handleKeyReleased(event.keyCode);
                 break;
             default:
                 console.error('Error: event ' + event.type + 'is not supported');
@@ -18,13 +18,15 @@ class EventHandler {
 
     handleKeyPressed(keyPressed) {
         switch(keyPressed) {
-            case 'q': 
+            case 37:
+            case 81: 
                 this.game.startDoodlerMovement(false, 'left');
                 break;
-            case 'd': 
+            case 39:
+            case 68: 
                 this.game.startDoodlerMovement(true, 'right');
                 break;
-            case 'z':
+            case 90:
                 this.game.jumpDoodler();
                 break;   
         }
@@ -32,16 +34,18 @@ class EventHandler {
 
     handleKeyReleased(keyLeft) {
         switch(keyLeft) {
-            case 'q': 
+            case 37:
+            case 81: 
                 this.game.stopDoodlerMovement(false);
                 break;
-            case 'd': 
+            case 39:
+            case 68: 
                 this.game.stopDoodlerMovement(true);
                 break;
-            case 'r':
+            case 82:
                 this.game.restartGame();
                 break;
-            case 'b':
+            case 27:
                 this.game.togglePause();
                 break;
         }
