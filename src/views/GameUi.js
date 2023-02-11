@@ -1,5 +1,6 @@
 class GameUi {
     main = document.querySelector('.main');
+    templates = document.querySelector('.template').content;
 
     constructor(game, map_width) {
         this.main.style.width = map_width + "px";
@@ -20,8 +21,7 @@ class GameUi {
     }
     
     initUi() {
-        this.doodlerElem = document.createElement('img');
-        this.doodlerElem.classList.add('doodler');
+        this.doodlerElem = this.templates.cloneNode(true).querySelector('.doodler');
         this.doodlerElem.style.width = this.game.doodler.width + 'px';
         this.doodlerElem.style.height = this.game.doodler.height + 'px';
         this.main.append(this.doodlerElem);
@@ -35,15 +35,22 @@ class GameUi {
     }
 
     createPlatform(platformObj) {
-        let platform = document.createElement('img');
+        let platform;
+        if (this.inactivePlatforms.length > 0) {
+            platform = this.inactivePlatforms.shift();
+        } else {
+            if (platformObj.broken) {
+                platform = this.templates.cloneNode(true).querySelector('.platform broken');
+            } else {
+                platform = this.templates.cloneNode(true).querySelector('.platform');
+            }
+            platform.style.height = platformObj.height + 'px';
+        }
+        platform.dataset.idData = platformObj.id;
+        platform.style.transform = `translate(${platformObj.position.x}px, ${platformObj.position.y}px)`;
+        
         this.activePlatforms.push(platform);
         this.main.append(platform);
-
-        platform.src = platformObj.skin;
-        platform.dataset.idData = platformObj.id;
-        platform.classList.add('platform');
-        platform.style.height = platformObj.height + 'px';
-        platform.style.transform = `translate(${platformObj.position.x}px, ${platformObj.position.y}px)`;
     }
 
     recyclePlatform(idPlatform) {

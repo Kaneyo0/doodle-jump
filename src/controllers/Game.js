@@ -26,7 +26,9 @@ class Game {
         this.game = function() {
             if (!this.isPaused) {
                 this.createPlatform();
-                this.platformYPosition = this.activePlatforms[this.activePlatforms.length - 1].position.y;
+                if ((Math.random() * 100) >= 30) {
+                    this.createPlatform(true);
+                }
                 this.doodler.horizontalMove();
                 this.doodler.jump();
                 this.CollisionHandler.testCollision();
@@ -35,11 +37,11 @@ class Game {
                 this.testPlatformPosition();
                 this.testEndGame();
             }
-            window.requestAnimationFrame(()=>{this.game()});
+            window.requestAnimationFrame(() => { this.game() });
         }
         
         this.GameUi.initUi();
-        window.requestAnimationFrame(()=>{this.game()});
+        window.requestAnimationFrame(() => { this.game() });
     }
 
     getDoodler() {
@@ -51,9 +53,7 @@ class Game {
     }
 
     getPlatformData(idPlatform) {
-        let result = this.activePlatforms.filter(platform => {
-            return platform.id == idPlatform;
-        })
+        let result = this.activePlatforms.filter(platform => { return platform.id == idPlatform });
         return result[0];
     }
 
@@ -81,9 +81,7 @@ class Game {
     controlScreenPosition() {
         if (this.doodler.position.y < window.innerHeight / 3) {
             this.doodler.move = false;
-            this.activePlatforms.forEach(platform => {
-                platform.position.y += this.doodler.velocity;
-            });
+            this.activePlatforms.forEach(platform => { platform.position.y += this.doodler.velocity });
         }
     }
 
@@ -94,19 +92,28 @@ class Game {
     doodlerIsTouching(object) {
         switch(object.constructor.name) {
             case 'Platform':
-                if (!object.broken) {
-                    this.jumpDoodler();
-                }
+                if (!object.broken) this.jumpDoodler();
                 break;
         }
     }
 
-    createPlatform() {
-        while (this.activePlatforms.length < nbPlatforms) {
-            let platform = new Platform(this.platformQuantity, gameWidth, this.platformYPosition);
-            this.platformQuantity ++;
+    createPlatform(broken = false) {
+        while (this.activePlatforms.length < nbPlatforms && this.verifyLastPlatform()) {
+            let platform;
+
+            if (this.inactivePlatforms.length > 0) {
+                platform = this.inactivePlatforms.shift();
+                platform.reset(this.platformYPosition);
+            } else {
+                platform = new Platform(this.platformQuantity, gameWidth, this.platformYPosition);
+            }
+
+            if (broken) platform.setBroken();
+            
+            if (this.platformYPosition > -300) this.platformYPosition -= 50;
+
+            this.platformQuantity++;
             this.activePlatforms.push(platform);
-            this.platformYPosition = this.activePlatforms[this.activePlatforms.length - 1].position.y - 50;
             this.GameUi.createPlatform(platform);
         }
     }
@@ -118,11 +125,18 @@ class Game {
         this.GameUi.recyclePlatform(idPlatform);
     }
 
+    verifyLastPlatform() {
+        if (this.activePlatforms.length > 0) {
+            if (this.activePlatforms[this.activePlatforms.length - 1].position.y > -300) return true;
+            return false;
+        }
+
+        return true;
+    }
+
     testPlatformPosition() {
         this.activePlatforms.forEach(platform => {
-            if (platform.position.y > this.doodler.position.y * 8) {
-                this.recyclePlatform(platform.id);
-            }
+            if (platform.position.y > window.innerHeight) this.recyclePlatform(platform.id);
         })
     }
 
