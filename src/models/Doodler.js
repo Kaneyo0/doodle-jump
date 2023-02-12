@@ -8,8 +8,6 @@ class Doodle extends Objects {
         super(true, positionX - (doodlerSize / 2), window.innerHeight - doodlerSize, doodlerSize, doodlerSize);
         this.skin = {left:'../../public/assets/doodler/lik-left.png', right:'../../public/assets/doodler/lik-right.png'};
         this.direction = 'left';
-        this.right = false;
-        this.left = false;
         this.jumping = true;
         this.movementSpeed = 12;
         this.velocity = baseVelocity;
@@ -30,7 +28,6 @@ class Doodle extends Objects {
             }
             this.velocity -= this.gravity;
             if (this.velocity <= 0) {
-                // this.move = true;
                 this.jumping = false;
             } 
         } else {
@@ -41,6 +38,13 @@ class Doodle extends Objects {
             }
         }
     }
+
+    horizontalMove() {
+        if (this.left) { this.position.x -= this.movementSpeed; }
+        if (this.right) { this.position.x += this.movementSpeed; }
+        if (this.position.x - this.width > this.gameWidth) { this.position.x = 0; }
+        if (this.position.x + this.width < 0) { this.position.x = this.gameWidth; }
+    } 
 }
 
 export default Doodle;

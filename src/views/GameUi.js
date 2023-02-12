@@ -39,12 +39,19 @@ class GameUi {
         if (this.inactivePlatforms.length > 0) {
             platform = this.inactivePlatforms.shift();
         } else {
-            if (platformObj.broken) {
-                platform = this.templates.cloneNode(true).querySelector('.platform broken');
-            } else {
-                platform = this.templates.cloneNode(true).querySelector('.platform');
-            }
+            platform = this.templates.cloneNode(true).querySelector('.platform');
             platform.style.height = platformObj.height + 'px';
+        }
+
+        switch (true) {
+            case platformObj.broken:
+                platform.src = platformObj.skin.broken;
+                break;
+            case platformObj.move:
+                platform.src = platformObj.skin.blue;
+                break;
+            default:
+                platform.src = platformObj.skin.green;
         }
         platform.dataset.idData = platformObj.id;
         platform.style.transform = `translate(${platformObj.position.x}px, ${platformObj.position.y}px)`;
@@ -53,8 +60,8 @@ class GameUi {
         this.main.append(platform);
     }
 
-    recyclePlatform(idPlatform) {
-        let platform = this.getPlatformElem(idPlatform);
+    recyclePlatform({ id }) {
+        let platform = this.getPlatformElem(id);
         this.inactivePlatforms.push(platform);
         this.activePlatforms.splice(this.activePlatforms.indexOf(platform), 1);
     }

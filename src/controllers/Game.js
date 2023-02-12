@@ -25,10 +25,8 @@ class Game {
         this.platformYPosition = platformBaseYPosition;
         this.game = function() {
             if (!this.isPaused) {
-                this.createPlatform();
-                if ((Math.random() * 100) >= 30) {
-                    this.createPlatform(true);
-                }
+                this.createPlatforms();
+                this.movePlatforms();
                 this.doodler.horizontalMove();
                 this.doodler.jump();
                 this.CollisionHandler.testCollision();
@@ -90,16 +88,33 @@ class Game {
     }
 
     doodlerIsTouching(object) {
+        console.log(object.constructor.name);
         switch(object.constructor.name) {
             case 'Platform':
-                if (!object.broken) this.jumpDoodler();
+                if (!object.broken) {
+                    this.jumpDoodler();
+                } else {
+                    object.fall = true;
+                }
                 break;
         }
     }
 
-    createPlatform(broken = false) {
+    createPlatforms() {
         while (this.activePlatforms.length < nbPlatforms && this.verifyLastPlatform()) {
             let platform;
+            let broken = false;
+            let move = false;
+            let random = Math.random() * 100;
+
+            switch (true) {
+                case random >= 95:
+                    broken = true;
+                    break;
+                case random >= 90:
+                    move = true;
+                    break;
+            }
 
             if (this.inactivePlatforms.length > 0) {
                 platform = this.inactivePlatforms.shift();
@@ -108,7 +123,8 @@ class Game {
                 platform = new Platform(this.platformQuantity, gameWidth, this.platformYPosition);
             }
 
-            if (broken) platform.setBroken();
+            platform.setBroken(broken);
+            platform.setMove(move);
             
             if (this.platformYPosition > -300) this.platformYPosition -= 50;
 
@@ -118,17 +134,26 @@ class Game {
         }
     }
 
-    recyclePlatform(idPlatform) {
-        let platform = this.getPlatformData(idPlatform);
+    movePlatforms() {
+        this.activePlatforms.forEach(platform => {
+            platform.refreshMove();
+        });
+    }
+
+    recyclePlatform(platform) {
         this.inactivePlatforms.push(platform);
         this.activePlatforms.splice(this.activePlatforms.indexOf(platform), 1);
-        this.GameUi.recyclePlatform(idPlatform);
+        this.GameUi.recyclePlatform(platform);
     }
 
     verifyLastPlatform() {
         if (this.activePlatforms.length > 0) {
-            if (this.activePlatforms[this.activePlatforms.length - 1].position.y > -300) return true;
-            return false;
+            for (let index = this.activePlatforms.length - 1; index > 0; index--) {
+                if (!this.activePlatforms[index].broken) {
+                    if (this.activePlatforms[this.activePlatforms.length - 1].position.y > -300) return true;
+                    return false;
+                }
+            }
         }
 
         return true;
@@ -136,7 +161,7 @@ class Game {
 
     testPlatformPosition() {
         this.activePlatforms.forEach(platform => {
-            if (platform.position.y > window.innerHeight) this.recyclePlatform(platform.id);
+            if (platform.position.y > window.innerHeight) this.recyclePlatform(platform);
         })
     }
 
