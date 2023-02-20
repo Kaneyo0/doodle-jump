@@ -5,8 +5,16 @@ class GameUi {
     constructor(game, map_width) {
         this.main.style.width = map_width + "px";
         this.game = game;
+
         this.activePlatforms = [];
         this.inactivePlatforms = [];
+
+        this.activeMonsters = [];
+        this.inactiveMonsters = [];
+
+        this.activePowerUps = [];
+        this.inactivePowerUps = [];
+
         this.doodlerElem;
         this.initEventsHandlers();
     }
@@ -27,43 +35,53 @@ class GameUi {
         this.main.append(this.doodlerElem);
     }
 
-    getPlatformElem(idPlatform) {
-        let result = this.activePlatforms.filter(platform => {
-            return platform.dataset.idData == idPlatform;
-        })
+    getAllUiElements() {
+        return this.activePlatforms.concat(this.activeMonsters).concat(this.activePowerUps);
+    }
+
+    getObject(idObject) {
+        let result = this.getAllUiElements().filter(object => { return object.dataset.idData == idObject });
         return result[0];
     }
 
-    createPlatform(platformObj) {
-        let platform;
-        if (this.inactivePlatforms.length > 0) {
-            platform = this.inactivePlatforms.shift();
-        } else {
-            platform = this.templates.cloneNode(true).querySelector('.platform');
-            platform.style.height = platformObj.height + 'px';
-        }
-
-        switch (true) {
-            case platformObj.broken:
-                platform.src = platformObj.skin.broken;
-                break;
-            case platformObj.move:
-                platform.src = platformObj.skin.blue;
-                break;
+    getElementTabs(object) {
+        switch(object.constructor.name) {
+            case 'Platform': 
+                return [this.activePlatforms, this.inactivePlatforms, '.platform'];
+            case 'Monster':
+                return [this.activeMonsters, this.inactiveMonsters, '.monster'];
+            case 'PowerUp':
+                return [this.activePowerUps, this.inactivePowerUps, '.power_up'];
             default:
-                platform.src = platformObj.skin.green;
+                console.log('Unknown game object');
         }
-        platform.dataset.idData = platformObj.id;
-        platform.style.transform = `translate(${platformObj.position.x}px, ${platformObj.position.y}px)`;
-        
-        this.activePlatforms.push(platform);
-        this.main.append(platform);
     }
 
-    recyclePlatform({ id }) {
-        let platform = this.getPlatformElem(id);
-        this.inactivePlatforms.push(platform);
-        this.activePlatforms.splice(this.activePlatforms.indexOf(platform), 1);
+    createObject(object) {
+        let elemTabs = this.getElementTabs(object);
+        let newElement;
+
+        if (elemTabs[1].length > 0) {
+            newElement = elemTabs[1].shift();
+        } else {
+            newElement = this.templates.cloneNode(true).querySelector(elemTabs[2]);
+            newElement.style.height = object.height + 'px';
+        }
+
+        newElement.src = object.skin;
+        newElement.dataset.idData = object.id;
+        newElement.style.transform = `translate(${object.position.x}px, ${object.position.y}px)`;
+        
+        elemTabs[0].push(newElement);
+        this.main.append(newElement);
+    }
+
+    recycleObject(object) {
+        let elemTabs = this.getElementTabs(object);
+        let elemToRecycle = this.getObject(object.id);
+
+        elemTabs[1].push(elemToRecycle);
+        elemTabs[0].splice(elemTabs[0].indexOf(elemToRecycle), 1);
     }
 
     refreshDoodler() {
@@ -79,16 +97,16 @@ class GameUi {
         this.doodlerElem.style.transform = `translate(${this.game.doodler.position.x}px, ${this.game.doodler.position.y}px)`;
     }
 
-    refreshPlatform() {
-        this.activePlatforms.forEach(platform => {
-            let platformData = this.game.getPlatformData(platform.dataset.idData);
-            platform.style.transform = `translate(${platformData.position.x}px, ${platformData.position.y}px)`;
-        })
+    refreshElements() {
+        this.getAllUiElements().forEach(uiElement => {
+            let objectData = this.game.getObjectData(uiElement.dataset.idData);
+            uiElement.style.transform = `translate(${objectData.position.x}px, ${objectData.position.y}px)`;
+        });
     }
 
     refreshGameUi() {
         this.refreshDoodler();
-        this.refreshPlatform();
+        this.refreshElements();
     }
 }
 

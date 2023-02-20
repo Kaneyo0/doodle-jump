@@ -1,12 +1,13 @@
 import Objects from './Objects.js';
 
-const baseVelocity = 18;
 const doodlerSize = 60;
+const baseVelocity = 18;
 
 class Doodle extends Objects {
     constructor(positionX) {
         super(true, positionX - (doodlerSize / 2), window.innerHeight - doodlerSize, doodlerSize, doodlerSize);
         this.skin = {left:'../../public/assets/doodler/lik-left.png', right:'../../public/assets/doodler/lik-right.png'};
+        this.canTouch = true;
         this.direction = 'left';
         this.jumping = true;
         this.movementSpeed = 12;
@@ -23,19 +24,13 @@ class Doodle extends Objects {
 
     jump() {
         if (this.jumping) {
-            if (this.move) {
-                this.position.y -= this.velocity;
-            }
+            if (this.move) this.position.y -= this.velocity;
             this.velocity -= this.gravity;
-            if (this.velocity <= 0) {
-                this.jumping = false;
-            } 
+            if (this.velocity <= 0) this.jumping = false; 
         } else {
             this.move = true;
             this.position.y += this.velocity;
-            if (this.velocity < baseVelocity) {
-                this.velocity += this.gravity;
-            }
+            if (this.velocity < baseVelocity) this.velocity += this.gravity;
         }
     }
 

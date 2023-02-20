@@ -4,24 +4,29 @@ class CollisionHandler {
     }
 
     testCollision() {
-        if (!this.game.getDoodler().jumping) {
-            if (this.game.getDoodler().position.y + this.game.getDoodler().height >= window.innerHeight) {
-                this.game.jumpDoodler();
-            }
-    
-            this.game.getAllPlatforms().forEach(platform => {
-                if (this.doodlerIsTouchingObject(platform)) {
-                    this.game.doodlerIsTouching(platform);
-                }
-            });
+        if (this.game.getDoodler().position.y + this.game.getDoodler().height >= window.innerHeight) {
+            this.game.jumpDoodler();
         }
+
+        this.game.getAllElements().forEach(element => {
+            if (this.doodlerIsTouchingObject(element)) {
+                this.game.doodlerIsTouching(element);
+            }
+        });
     }
 
     doodlerIsTouchingObject(object) {
-        return this.game.getDoodler().position.y + this.game.getDoodler().height >= object.position.y && 
-               this.game.getDoodler().position.x + this.game.getDoodler().width >= object.position.x &&
-               object.position.y >= this.game.getDoodler().position.y &&
-               object.position.x + object.width >= this.game.getDoodler().position.x
+        let doodler = this.game.getDoodler();
+
+        return  (doodler.position.y + doodler.height >= object.position.y && 
+                doodler.position.x + doodler.width >= object.position.x &&
+                object.position.y + object.height >= doodler.position.y &&
+                object.position.x + object.width >= doodler.position.x);
+        
+        // return !(object.position.x > doodler.position.x + doodler.width 
+        //         && object.position.x < doodler.position.x - object.width
+        //         && object.position.y > doodler.position.y + doodler.height
+        //         && object.position.y < doodler.position.y - object.height);
     }
 }
 

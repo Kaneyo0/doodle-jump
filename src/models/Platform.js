@@ -2,67 +2,70 @@ import Objects from './Objects.js';
 
 const height = 20;
 const width = height * 3.83;
-const variation = 120;
 const baseVelocity = 18;
 
 class Platform extends Objects {
+
     constructor(id, gameWidth, baseYPosition) {
         super(false, Math.floor(Math.random() * (gameWidth - width)), baseYPosition, width, height);
-        this.skin = {
+        this.skinChoice = {
             green:'../../public/assets/environment/green-platform.png', 
             blue:'../../public/assets/environment/blue-platform.png',
             broken:'../../public/assets/environment/broken-platform_1.png'
         };
+        this.skin = this.skinChoice.green;
         this.id = id;
         this.broken = false;
         this.fall = false;
-        this.movementSpeed = 6;
+        this.movementSpeed = 3;
         this.velocity = baseVelocity;
         this.gravity = 0.7;
     }
 
     reset(baseYPosition) {
         this.position.x = Math.floor(Math.random() * (this.gameWidth - width));
-        this.position.y = Math.floor(Math.random() * (baseYPosition - (baseYPosition - variation)) + (baseYPosition - variation))
+        this.position.y = baseYPosition;
         this.fall = false;
+        this.right = false;
+        this.left = false;
+        this.up = false;
+        this.down = false;
+        this.movement.horizontal = false;
+        this.movement.vertical = false;
         if (this.broken) this.velocity = baseVelocity;
     }
 
     setBroken(broken) {
         this.broken = broken;
+        if (broken) this.skin = this.skinChoice.broken;
     }
 
     setMove(move) {
         this.move = move;
-        if (move) this.left = true;
+        if (move) {
+            this.skin = this.skinChoice.blue;
+            if (Math.random() * 100 > 50) {
+                this.movement.horizontal = true;
+                this.left = true;
+            } else {
+                this.movement.vertical = true;
+                this.up = true;
+            }
+        }
     }
 
     refreshMove() {
         if (this.broken) this.beginFall();
-        if (this.move) this.horizontalMove();
+        if (this.move) {
+            if (this.movement.horizontal) this.horizontalMove();
+            if (this.movement.vertical) this.verticalMove();
+        } 
     }
 
     beginFall() {
         if (this.fall) {
             this.position.y += this.velocity;
             this.velocity += this.gravity;
-        }
-    }
-
-    horizontalMove() {
-        if (this.left) {
-            this.position.x -= this.movementSpeed;
-        }
-        if (this.right) {
-            this.position.x += this.movementSpeed;
-        }
-        if (this.position.x + this.width >= this.gameWidth) {
-            this.right = false;
-            this.left = true;
-        }
-        if (this.position.x <= 0) {
-            this.right = true;
-            this.left = false;
         }
     }
 }

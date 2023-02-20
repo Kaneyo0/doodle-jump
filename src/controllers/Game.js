@@ -5,10 +5,16 @@ import CollisionHandler from "./gameControllers/CollisionHandler.js";
 import MovementController from "./gameControllers/MovementController.js";
 import Doodler from "../models/Doodler.js";
 import Platform from "../models/platform.js";
+import Monster from "../models/Monster.js";
+import PowerUp from "../models/PowerUp.js";
 
 const gameWidth = 1200;
-const nbPlatforms = 40;
+const nbPlatforms = 20;
+const nbMonsters = 5;
 const platformBaseYPosition = window.innerHeight - 100;
+const spaceBetweenPlatforms = 100;
+const chanceToMove = 20;
+const chanceToBroke = 10;
 
 class Game {
     constructor() {
@@ -19,21 +25,23 @@ class Game {
         this.CollisionHandler = new CollisionHandler(this);
         this.MovementController = new MovementController();
         this.doodler = new Doodler(gameWidth/2);
+        this.objectQuantity = 0;
+
         this.activePlatforms = [];
         this.inactivePlatforms = [];
-        this.platformQuantity = 0;
         this.platformYPosition = platformBaseYPosition;
+
+        this.activeMonsters = [];
+        this.inactiveMonsters = [];
+
+        this.activePowerUps = [];
+        this.inactivePowerUps = [];
+
         this.game = function() {
             if (!this.isPaused) {
-                this.createPlatforms();
-                this.movePlatforms();
-                this.doodler.horizontalMove();
-                this.doodler.jump();
-                this.CollisionHandler.testCollision();
-                this.controlScreenPosition();
-                this.GameUi.refreshGameUi();
-                this.testPlatformPosition();
-                this.testEndGame();
+                this.createGameElements();
+                this.moveGameElements();
+                this.controlGameElements();
             }
             window.requestAnimationFrame(() => { this.game() });
         }
@@ -46,13 +54,26 @@ class Game {
         return this.doodler;
     }
 
-    getAllPlatforms() {
-        return this.activePlatforms;
+    getAllElements() {
+        return this.activePlatforms.concat(this.activeMonsters).concat(this.activePowerUps);
     }
 
-    getPlatformData(idPlatform) {
-        let result = this.activePlatforms.filter(platform => { return platform.id == idPlatform });
+    getObjectData(idObject) {
+        let result = this.getAllElements().filter(object => { return object.id == idObject });
         return result[0];
+    }
+
+    getElementTabs(object) {
+        switch(object.constructor.name) {
+            case 'Platform': 
+                return [this.activePlatforms, this.inactivePlatforms, '.platform'];
+            case 'Monster':
+                return [this.activeMonsters, this.inactiveMonsters, '.monster'];
+            case 'PowerUp':
+                return [this.activePowerUps, this.inactivePowerUps, '.power_up'];
+            default:
+                console.log('Unknown game object');
+        }
     }
 
     receiveEvent(event) {
@@ -68,6 +89,24 @@ class Game {
         this.isPaused = false;
     }
 
+    createGameElements() {
+        this.createPlatforms();
+        // this.createMonsters();
+    }
+    
+    moveGameElements() {
+        this.doodler.horizontalMove();
+        this.doodler.jump();
+        this.moveEnvironment();
+    }
+
+    controlGameElements() {
+        this.CollisionHandler.testCollision();
+        this.controlScreenPosition();
+        this.GameUi.refreshGameUi();
+        this.testObjectsPosition();
+    }
+
     startDoodlerMovement(right, direction) {
         this.MovementController.startObjectMovement(this.doodler, right, direction);
     }
@@ -79,7 +118,7 @@ class Game {
     controlScreenPosition() {
         if (this.doodler.position.y < window.innerHeight / 3) {
             this.doodler.move = false;
-            this.activePlatforms.forEach(platform => { platform.position.y += this.doodler.velocity });
+            this.getAllElements().forEach(element => { element.position.y += this.doodler.velocity });
         }
     }
 
@@ -88,15 +127,31 @@ class Game {
     }
 
     doodlerIsTouching(object) {
-        console.log(object.constructor.name);
-        switch(object.constructor.name) {
-            case 'Platform':
-                if (!object.broken) {
+        if (this.doodler.canTouch) {
+            let constructor = object.constructor.name;
+            switch(constructor) {
+                case 'Platform':
+                    if (!object.broken) {
+                        if (!this.doodler.jumping) this.jumpDoodler();
+                    } else {
+                        object.fall = true;
+                    }
+                    break;
+                case 'Monster':
+                    object.skin = '';
+                    // console.log(this.doodler.jumping + ' feur ' + this.monsterCount);
+                    // this.monsterCount++;
+                    // this.doodler.jumping ? this.endGame() : this.jumpDoodler();
                     this.jumpDoodler();
-                } else {
-                    object.fall = true;
-                }
-                break;
+                    break;
+                case 'PowerUp':
+                    this.recycleObject(object);
+                    this.doodler.gravity = 0;
+                    this.doodler.velocity = 18;
+                    break;
+                default:
+                    console.log('Unknown ' + constructor + ' element');
+            }
         }
     }
 
@@ -108,10 +163,10 @@ class Game {
             let random = Math.random() * 100;
 
             switch (true) {
-                case random >= 95:
+                case random <= chanceToBroke:
                     broken = true;
                     break;
-                case random >= 90:
+                case random <= chanceToMove:
                     move = true;
                     break;
             }
@@ -120,37 +175,86 @@ class Game {
                 platform = this.inactivePlatforms.shift();
                 platform.reset(this.platformYPosition);
             } else {
-                platform = new Platform(this.platformQuantity, gameWidth, this.platformYPosition);
+                platform = new Platform(this.objectQuantity, gameWidth, this.platformYPosition);
             }
 
             platform.setBroken(broken);
             platform.setMove(move);
             
-            if (this.platformYPosition > -300) this.platformYPosition -= 50;
+            if (this.platformYPosition > -300) this.platformYPosition -= spaceBetweenPlatforms;
 
-            this.platformQuantity++;
+            this.objectQuantity++;
+            if (!broken && !move && random < 50) {
+                this.createPowerUp(platform.position)
+            }
             this.activePlatforms.push(platform);
-            this.GameUi.createPlatform(platform);
+            this.GameUi.createObject(platform);
         }
     }
 
-    movePlatforms() {
-        this.activePlatforms.forEach(platform => {
-            platform.refreshMove();
+    createMonsters() {
+        let random = Math.random() * 100;
+        if (this.activeMonsters.length < nbMonsters && random <= 1) {
+            let monster;
+            let move = false;
+            let random = Math.random() * 100;
+
+            switch (true) {
+                case random <= chanceToMove:
+                    move = true;
+                    break;
+            }
+
+            if (this.inactiveMonsters.length > 0) {
+                monster = this.inactiveMonsters.shift();
+                monster.reset();
+            } else {
+                monster = new Monster(this.objectQuantity, gameWidth);
+            }
+
+            monster.setMove(move);
+
+            this.objectQuantity++;
+            this.activeMonsters.push(monster);
+            this.GameUi.createObject(monster);
+        }
+    }
+
+    createPowerUp({ x, y }) {
+        let powerUp;
+
+        if (this.inactivePowerUps.length > 0) {
+            powerUp = this.inactivePowerUps.shift();
+            // powerUp.reset();
+        } else {
+            powerUp = new PowerUp(this.objectQuantity ,x, y);
+        }
+
+        this.objectQuantity++;
+        this.activePowerUps.push(powerUp);
+        this.GameUi.createObject(powerUp);
+    }
+
+    moveEnvironment() {
+        this.getAllElements().forEach(gameElement => { 
+            if (gameElement.constructor.name != 'PowerUp') { gameElement.refreshMove() }
         });
     }
 
-    recyclePlatform(platform) {
-        this.inactivePlatforms.push(platform);
-        this.activePlatforms.splice(this.activePlatforms.indexOf(platform), 1);
-        this.GameUi.recyclePlatform(platform);
+    recycleObject(object) {
+        let elemTabs = this.getElementTabs(object);
+        
+        elemTabs[1].push(object);
+        elemTabs[0].splice(elemTabs[0].indexOf(object), 1);
+
+        this.GameUi.recycleObject(object);
     }
 
     verifyLastPlatform() {
         if (this.activePlatforms.length > 0) {
             for (let index = this.activePlatforms.length - 1; index > 0; index--) {
                 if (!this.activePlatforms[index].broken) {
-                    if (this.activePlatforms[this.activePlatforms.length - 1].position.y > -300) return true;
+                    if (this.activePlatforms[this.activePlatforms.length - 1].position.y >= this.platformYPosition + spaceBetweenPlatforms) return true;
                     return false;
                 }
             }
@@ -159,17 +263,17 @@ class Game {
         return true;
     }
 
-    testPlatformPosition() {
-        this.activePlatforms.forEach(platform => {
-            if (platform.position.y > window.innerHeight) this.recyclePlatform(platform);
-        })
+    testObjectsPosition() {
+        this.getAllElements().forEach(gameElement => {
+            if (gameElement.position.y > window.innerHeight + 200) this.recycleObject(gameElement);
+        });
+
+        if (this.doodler.position.y > window.innerHeight + 200) this.endGame();
     }
 
-    testEndGame() {
-        if (this.doodler.position.y > window.innerHeight) {
-            this.isPaused = true;
-            console.log('Game Over');
-        }
+    endGame() {
+        this.isPaused = true;
+        console.log('Game Over');
     }
 }
 
