@@ -13,8 +13,7 @@ const nbPlatforms = 20;
 const nbMonsters = 5;
 const platformBaseYPosition = window.innerHeight - 100;
 const spaceBetweenPlatforms = 100;
-const chanceToMove = 20;
-const chanceToBroke = 10;
+
 
 class Game {
     constructor() {
@@ -63,17 +62,17 @@ class Game {
         return result[0];
     }
 
-    getElementTabs(object) {
-        switch(object.constructor.name) {
-            case 'Platform': 
-                return [this.activePlatforms, this.inactivePlatforms, '.platform'];
-            case 'Monster':
-                return [this.activeMonsters, this.inactiveMonsters, '.monster'];
-            case 'PowerUp':
-                return [this.activePowerUps, this.inactivePowerUps, '.power_up'];
+    getElementTabs(constructor) {
+        switch(constructor) {
+            case Platform: 
+                return {active: this.activePlatforms, inactive: this.inactivePlatforms}
+            case Monster:
+                return {active: this.activeMonsters, inactive: this.inactiveMonsters}
+            case PowerUp:
+                return {active: this.activePowerUps, inactive: this.inactivePowerUps}
             default:
                 console.log('Unknown game object');
-        }
+        } 
     }
 
     receiveEvent(event) {
@@ -90,7 +89,10 @@ class Game {
     }
 
     createGameElements() {
-        this.createPlatforms();
+        while (this.activePlatforms.length < nbPlatforms && this.verifyLastPlatform()) {
+            this.createObject(Platform, gameWidth, this.platformYPosition);
+        }
+        // this.createPlatforms();
         // this.createMonsters();
     }
     
@@ -128,124 +130,62 @@ class Game {
 
     doodlerIsTouching(object) {
         if (this.doodler.canTouch) {
-            let constructor = object.constructor.name;
+            let constructor = object.constructor;
+
             switch(constructor) {
-                case 'Platform':
+                case Platform:
                     if (!object.broken) {
                         if (!this.doodler.jumping) this.jumpDoodler();
                     } else {
-                        object.fall = true;
+                        object.falling = true;
                     }
                     break;
-                case 'Monster':
+                case Monster:
                     object.skin = '';
-                    // console.log(this.doodler.jumping + ' feur ' + this.monsterCount);
-                    // this.monsterCount++;
-                    // this.doodler.jumping ? this.endGame() : this.jumpDoodler();
-                    this.jumpDoodler();
+                    this.doodler.jumping ? this.endGame() : this.jumpDoodler();
                     break;
-                case 'PowerUp':
+                case PowerUp:
+                    this.applyEffect(object.effect);
                     this.recycleObject(object);
-                    this.doodler.gravity = 0;
-                    this.doodler.velocity = 18;
                     break;
                 default:
-                    console.log('Unknown ' + constructor + ' element');
+                    console.log(`Unknown ${constructor} element`);
             }
         }
     }
 
-    createPlatforms() {
-        while (this.activePlatforms.length < nbPlatforms && this.verifyLastPlatform()) {
-            let platform;
-            let broken = false;
-            let move = false;
-            let random = Math.random() * 100;
-
-            switch (true) {
-                case random <= chanceToBroke:
-                    broken = true;
-                    break;
-                case random <= chanceToMove:
-                    move = true;
-                    break;
-            }
-
-            if (this.inactivePlatforms.length > 0) {
-                platform = this.inactivePlatforms.shift();
-                platform.reset(this.platformYPosition);
-            } else {
-                platform = new Platform(this.objectQuantity, gameWidth, this.platformYPosition);
-            }
-
-            platform.setBroken(broken);
-            platform.setMove(move);
-            
-            if (this.platformYPosition > -300) this.platformYPosition -= spaceBetweenPlatforms;
-
-            this.objectQuantity++;
-            if (!broken && !move && random < 50) {
-                this.createPowerUp(platform.position)
-            }
-            this.activePlatforms.push(platform);
-            this.GameUi.createObject(platform);
-        }
-    }
-
-    createMonsters() {
+    createObject(constructor, x, y) {
         let random = Math.random() * 100;
-        if (this.activeMonsters.length < nbMonsters && random <= 1) {
-            let monster;
-            let move = false;
-            let random = Math.random() * 100;
+        let elemTabs = this.getElementTabs(constructor); 
+        let newObject;
 
-            switch (true) {
-                case random <= chanceToMove:
-                    move = true;
-                    break;
-            }
-
-            if (this.inactiveMonsters.length > 0) {
-                monster = this.inactiveMonsters.shift();
-                monster.reset();
-            } else {
-                monster = new Monster(this.objectQuantity, gameWidth);
-            }
-
-            monster.setMove(move);
-
-            this.objectQuantity++;
-            this.activeMonsters.push(monster);
-            this.GameUi.createObject(monster);
-        }
-    }
-
-    createPowerUp({ x, y }) {
-        let powerUp;
-
-        if (this.inactivePowerUps.length > 0) {
-            powerUp = this.inactivePowerUps.shift();
-            // powerUp.reset();
+        if (elemTabs.inactive.length > 0) {
+            newObject = elemTabs.inactive.shift();
+            newObject.reset(this.platformYPosition);
         } else {
-            powerUp = new PowerUp(this.objectQuantity ,x, y);
+            newObject = new constructor(this.objectQuantity ,x, y);
         }
 
         this.objectQuantity++;
-        this.activePowerUps.push(powerUp);
-        this.GameUi.createObject(powerUp);
+        if (constructor == Platform) {
+            if (this.platformYPosition > -300) this.platformYPosition -= spaceBetweenPlatforms;
+            // if (!newObject.broken && !newObject.move && random < 50) this.createObject(PowerUp, newObject.position.x, newObject.position.y);
+        }
+        elemTabs.active.push(newObject);
+        this.GameUi.createObject(newObject);
     }
 
     moveEnvironment() {
         this.getAllElements().forEach(gameElement => { 
-            if (gameElement.constructor.name != 'PowerUp') { gameElement.refreshMove() }
+            if (gameElement.constructor != PowerUp) gameElement.refreshMove();
         });
     }
 
     recycleObject(object) {
-        let elemTabs = this.getElementTabs(object);
+        let elemTabs = this.getElementTabs(object.constructor);
         
-        elemTabs[1].push(object);
-        elemTabs[0].splice(elemTabs[0].indexOf(object), 1);
+        elemTabs.inactive.push(object);
+        elemTabs.active.splice(elemTabs.active.indexOf(object), 1);
 
         this.GameUi.recycleObject(object);
     }
@@ -261,6 +201,11 @@ class Game {
         }
 
         return true;
+    }
+
+    applyEffect({ gravity, velocity }) {
+        this.doodler.gravity = gravity;
+        this.doodler.velocity = velocity;
     }
 
     testObjectsPosition() {

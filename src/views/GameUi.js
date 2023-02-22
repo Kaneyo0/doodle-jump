@@ -1,3 +1,7 @@
+import Platform from "../models/platform.js";
+import Monster from "../models/Monster.js";
+import PowerUp from "../models/PowerUp.js";
+
 class GameUi {
     main = document.querySelector('.main');
     templates = document.querySelector('.template').content;
@@ -44,27 +48,27 @@ class GameUi {
         return result[0];
     }
 
-    getElementTabs(object) {
-        switch(object.constructor.name) {
-            case 'Platform': 
-                return [this.activePlatforms, this.inactivePlatforms, '.platform'];
-            case 'Monster':
-                return [this.activeMonsters, this.inactiveMonsters, '.monster'];
-            case 'PowerUp':
-                return [this.activePowerUps, this.inactivePowerUps, '.power_up'];
+    getElementTabs(constructor) {
+        switch(constructor) {
+            case Platform: 
+                return {active: this.activePlatforms, inactive: this.inactivePlatforms, className: '.platform'}
+            case Monster:
+                return {active: this.activeMonsters, inactive: this.inactiveMonsters, className: '.monster'}
+            case PowerUp:
+                return {active: this.activePowerUps, inactive: this.inactivePowerUps, className: '.power_up'}
             default:
                 console.log('Unknown game object');
         }
     }
 
     createObject(object) {
-        let elemTabs = this.getElementTabs(object);
+        let elemTabs = this.getElementTabs(object.constructor);
         let newElement;
 
-        if (elemTabs[1].length > 0) {
-            newElement = elemTabs[1].shift();
+        if (elemTabs.inactive.length > 0) {
+            newElement = elemTabs.inactive.shift();
         } else {
-            newElement = this.templates.cloneNode(true).querySelector(elemTabs[2]);
+            newElement = this.templates.cloneNode(true).querySelector(elemTabs.className);
             newElement.style.height = object.height + 'px';
         }
 
@@ -72,16 +76,16 @@ class GameUi {
         newElement.dataset.idData = object.id;
         newElement.style.transform = `translate(${object.position.x}px, ${object.position.y}px)`;
         
-        elemTabs[0].push(newElement);
+        elemTabs.active.push(newElement);
         this.main.append(newElement);
     }
 
     recycleObject(object) {
-        let elemTabs = this.getElementTabs(object);
+        let elemTabs = this.getElementTabs(object.constructor);
         let elemToRecycle = this.getObject(object.id);
 
-        elemTabs[1].push(elemToRecycle);
-        elemTabs[0].splice(elemTabs[0].indexOf(elemToRecycle), 1);
+        elemTabs.inactive.push(elemToRecycle);
+        elemTabs.active.splice(elemTabs.active.indexOf(elemToRecycle), 1);
     }
 
     refreshDoodler() {

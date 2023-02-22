@@ -3,7 +3,8 @@ import Objects from "./Objects.js";
 const height = 40;
 const width = height * 3.83;
 const baseVelocity = 18;
-const yPosition = -200
+const yPosition = -200;
+const chanceToMove = 20;
 
 class Monster extends Objects {
 
@@ -14,9 +15,24 @@ class Monster extends Objects {
         this.movementSpeed = 3;
         this.velocity = baseVelocity;
         this.gravity = 0.7;
+        this.init();
+    }
+
+    init() {
+        let random = Math.random() * 100;
+        let move = false;
+
+        switch (true) {
+            case random <= chanceToMove:
+                move = true;
+                break;
+        }
+
+        this.setMove(move);
     }
 
     reset() {
+        this.init();
         this.position.x = Math.floor(Math.random() * (this.gameWidth - width));
         this.position.y = yPosition;
         this.right = false;
