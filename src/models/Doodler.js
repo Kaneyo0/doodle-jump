@@ -1,37 +1,39 @@
 import Objects from './Objects.js';
 
 const doodlerSize = 60;
+const baseMovementSpeed = 12;
 const baseVelocity = 18;
+const baseGravity = 0.7;
 
 class Doodle extends Objects {
-    constructor(positionX) {
-        super(true, positionX - (doodlerSize / 2), window.innerHeight - doodlerSize, doodlerSize, doodlerSize);
+    constructor(gameWidth) {
+        super(true, (gameWidth/2) - (doodlerSize / 2), window.innerHeight - doodlerSize, doodlerSize, doodlerSize, gameWidth);
         this.skin = {left:'../../public/assets/doodler/lik-left.png', right:'../../public/assets/doodler/lik-right.png'};
         this.canTouch = true;
         this.direction = 'left';
-        this.jumping = true;
-        this.movementSpeed = 12;
+        this.movementSpeed = baseMovementSpeed;
         this.velocity = baseVelocity;
-        this.gravity = 0.7;
+        this.gravity = baseGravity;
+    }
+
+    reset() {
+        this.gravity = baseGravity;
+        this.canTouch = true;
     }
 
     initJump() {
-        if (this.move) {
-            this.velocity = baseVelocity;
-            this.jumping = true;
-        }
+        if (this.canMove) 
+        this.velocity = baseVelocity;
     }
 
     jump() {
-        if (this.jumping) {
-            if (this.move) this.position.y -= this.velocity;
-            this.velocity -= this.gravity;
-            if (this.velocity <= 0) this.jumping = false; 
-        } else {
-            this.move = true;
-            this.position.y += this.velocity;
-            if (this.velocity < baseVelocity) this.velocity += this.gravity;
-        }
+        if (this.canMove) this.position.y -= this.velocity;
+        this.velocity -= this.gravity;
+        if (this.velocity <= 0) this.canMove = true; 
+    }
+
+    isJumping() {
+        return this.velocity > 0;
     }
 
     horizontalMove() {
@@ -40,6 +42,18 @@ class Doodle extends Objects {
         if (this.position.x - this.width > this.gameWidth) { this.position.x = 0; }
         if (this.position.x + this.width < 0) { this.position.x = this.gameWidth; }
     } 
+
+    move() {
+        this.jump();
+        this.horizontalMove();
+    }
+
+    applyEffect({ gravityMultiplicator, velocityMultiplicator, jump }) {
+        if(jump) this.initJump();
+        this.gravity = baseGravity * gravityMultiplicator;
+        this.velocity = baseVelocity * velocityMultiplicator;
+        this.canTouch = false;
+    }
 }
 
 export default Doodle;

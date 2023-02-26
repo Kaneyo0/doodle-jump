@@ -9,7 +9,7 @@ const chanceToMove = 20;
 class Monster extends Objects {
 
     constructor(id, gameWidth) {
-        super(false, Math.floor(Math.random() * (gameWidth - width)), yPosition, width, height);
+        super(false, Math.floor(Math.random() * (gameWidth - width)), yPosition, width, height, gameWidth);
         this.skin = '../../public/assets/monsters/monster_1.png';
         this.id = id;
         this.movementSpeed = 3;
@@ -20,19 +20,24 @@ class Monster extends Objects {
 
     init() {
         let random = Math.random() * 100;
-        let move = false;
 
         switch (true) {
             case random <= chanceToMove:
-                move = true;
+                this.canMove = true;
+                if (Math.random() * 100 > 50) {
+                    this.movement.horizontal = true;
+                    this.left = true;
+                } else {
+                    this.movement.vertical = true;
+                    this.up = true;
+                }
                 break;
+            default:
+                this.canMove = false;
         }
-
-        this.setMove(move);
     }
 
     reset() {
-        this.init();
         this.position.x = Math.floor(Math.random() * (this.gameWidth - width));
         this.position.y = yPosition;
         this.right = false;
@@ -41,23 +46,11 @@ class Monster extends Objects {
         this.down = false;
         this.movement.horizontal = false;
         this.movement.vertical = false;
-    }
-
-    setMove(move) {
-        this.move = move;
-        if (move) {
-            if (Math.random() * 100 > 50) {
-                this.movement.horizontal = true;
-                this.left = true;
-            } else {
-                this.movement.vertical = true;
-                this.up = true;
-            }
-        }
+        this.init();
     }
 
     refreshMove() {
-        if (this.move) {
+        if (this.canMove) {
             if (this.movement.horizontal) this.horizontalMove();
             if (this.movement.vertical) this.verticalMove();
         } 

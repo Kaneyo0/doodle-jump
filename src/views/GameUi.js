@@ -69,11 +69,11 @@ class GameUi {
             newElement = elemTabs.inactive.shift();
         } else {
             newElement = this.templates.cloneNode(true).querySelector(elemTabs.className);
-            newElement.style.height = object.height + 'px';
         }
-
+        
         newElement.src = object.skin;
         newElement.dataset.idData = object.id;
+        newElement.style.height = object.height + 'px';
         newElement.style.transform = `translate(${object.position.x}px, ${object.position.y}px)`;
         
         elemTabs.active.push(newElement);

@@ -8,12 +8,13 @@ import Platform from "../models/platform.js";
 import Monster from "../models/Monster.js";
 import PowerUp from "../models/PowerUp.js";
 
-const gameWidth = 1200;
-const nbPlatforms = 20;
+const gameWidth = 1000;
+const nbPlatforms = 40;
 const nbMonsters = 5;
 const platformBaseYPosition = window.innerHeight - 100;
 const spaceBetweenPlatforms = 100;
-
+const chanceMonsterAppear = 20;
+const chanceToPowerUp = 30;
 
 class Game {
     constructor() {
@@ -23,7 +24,7 @@ class Game {
         this.EventHandler = new EventHandler(this);
         this.CollisionHandler = new CollisionHandler(this);
         this.MovementController = new MovementController();
-        this.doodler = new Doodler(gameWidth/2);
+        this.doodler = new Doodler(gameWidth);
         this.objectQuantity = 0;
 
         this.activePlatforms = [];
@@ -35,6 +36,10 @@ class Game {
 
         this.activePowerUps = [];
         this.inactivePowerUps = [];
+
+        this.activeEffect = false;
+        this.timeEffect = 0;
+        this.startEffect;
 
         this.game = function() {
             if (!this.isPaused) {
@@ -84,25 +89,21 @@ class Game {
     }
 
     restartGame() {
-        this.doodler = new Doodler(gameWidth/2);
+        this.doodler = new Doodler(gameWidth);
         this.isPaused = false;
     }
 
     createGameElements() {
-        while (this.activePlatforms.length < nbPlatforms && this.verifyLastPlatform()) {
-            this.createObject(Platform, gameWidth, this.platformYPosition);
-        }
-        // this.createPlatforms();
-        // this.createMonsters();
+        while (this.activePlatforms.length < nbPlatforms && this.verifyLastPlatform()) this.createObject(Platform, gameWidth, this.platformYPosition);
     }
     
     moveGameElements() {
-        this.doodler.horizontalMove();
-        this.doodler.jump();
+        this.doodler.move();
         this.moveEnvironment();
     }
 
     controlGameElements() {
+        this.controlActiveEffect();
         this.CollisionHandler.testCollision();
         this.controlScreenPosition();
         this.GameUi.refreshGameUi();
@@ -117,15 +118,18 @@ class Game {
         this.MovementController.stopObjectMovement(this.doodler, right);
     }
 
-    controlScreenPosition() {
-        if (this.doodler.position.y < window.innerHeight / 3) {
-            this.doodler.move = false;
-            this.getAllElements().forEach(element => { element.position.y += this.doodler.velocity });
+    controlActiveEffect() {
+        if (this.activeEffect && Date.now() - this.startEffect >= this.timeEffect) {
+            this.activeEffect = false;
+            this.doodler.reset();
         }
     }
 
-    jumpDoodler() {
-        this.doodler.initJump();
+    controlScreenPosition() {
+        if (this.doodler.position.y < window.innerHeight / 3 && this.doodler.isJumping()) {
+            this.doodler.canMove = false;
+            this.getAllElements().forEach(element => { element.position.y += this.doodler.velocity });
+        }
     }
 
     doodlerIsTouching(object) {
@@ -135,18 +139,18 @@ class Game {
             switch(constructor) {
                 case Platform:
                     if (!object.broken) {
-                        if (!this.doodler.jumping) this.jumpDoodler();
+                        if (!this.doodler.isJumping()) this.doodler.initJump();
                     } else {
                         object.falling = true;
                     }
                     break;
                 case Monster:
                     object.skin = '';
-                    this.doodler.jumping ? this.endGame() : this.jumpDoodler();
+                    this.doodler.isJumping() ? this.endGame() : this.doodler.initJump();
                     break;
                 case PowerUp:
                     this.applyEffect(object.effect);
-                    this.recycleObject(object);
+                    // if (!object.effect.jump) this.recycleObject(object);
                     break;
                 default:
                     console.log(`Unknown ${constructor} element`);
@@ -161,16 +165,26 @@ class Game {
 
         if (elemTabs.inactive.length > 0) {
             newObject = elemTabs.inactive.shift();
-            newObject.reset(this.platformYPosition);
+            if (constructor == PowerUp) newObject.reset(x, y);
+            if (constructor == Platform) newObject.reset(this.platformYPosition);
         } else {
             newObject = new constructor(this.objectQuantity ,x, y);
         }
 
         this.objectQuantity++;
+
         if (constructor == Platform) {
             if (this.platformYPosition > -300) this.platformYPosition -= spaceBetweenPlatforms;
-            // if (!newObject.broken && !newObject.move && random < 50) this.createObject(PowerUp, newObject.position.x, newObject.position.y);
+            switch (true) {
+                case random <= chanceMonsterAppear:
+                    if (this.activeMonsters.length < nbMonsters) this.createObject(Monster, gameWidth, this.platformYPosition);
+                    break;
+                case random <= chanceToPowerUp:
+                    if (!newObject.broken && !newObject.canMove) this.createObject(PowerUp, newObject.position.x + (newObject.width/3), newObject.position.y);
+                    break;
+            }
         }
+
         elemTabs.active.push(newObject);
         this.GameUi.createObject(newObject);
     }
@@ -203,14 +217,16 @@ class Game {
         return true;
     }
 
-    applyEffect({ gravity, velocity }) {
-        this.doodler.gravity = gravity;
-        this.doodler.velocity = velocity;
+    applyEffect({ time, ...effect }) {
+        this.activeEffect = true;
+        this.timeEffect = time;
+        this.startEffect = Date.now();
+        this.doodler.applyEffect(effect);
     }
 
     testObjectsPosition() {
         this.getAllElements().forEach(gameElement => {
-            if (gameElement.position.y > window.innerHeight + 200) this.recycleObject(gameElement);
+            if (gameElement.position.y > window.innerHeight + gameElement.height) this.recycleObject(gameElement);
         });
 
         if (this.doodler.position.y > window.innerHeight + 200) this.endGame();

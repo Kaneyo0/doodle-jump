@@ -27,7 +27,7 @@ class EventHandler {
                 this.game.startDoodlerMovement(true, 'right');
                 break;
             case 90:
-                this.game.jumpDoodler();
+                this.game.getDoodler().initJump();
                 break;   
         }
     }

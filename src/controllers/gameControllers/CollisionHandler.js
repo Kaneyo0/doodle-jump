@@ -4,8 +4,10 @@ class CollisionHandler {
     }
 
     testCollision() {
-        if (this.game.getDoodler().position.y + this.game.getDoodler().height >= window.innerHeight) {
-            this.game.jumpDoodler();
+        let doodler = this.game.getDoodler();
+
+        if (doodler.position.y + doodler.height >= window.innerHeight) {
+            doodler.initJump();
         }
 
         this.game.getAllElements().forEach(element => {

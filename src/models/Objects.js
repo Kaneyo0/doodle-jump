@@ -1,8 +1,7 @@
-const gameWidth = 1200;
 const verticalMovement = 200;
 
 class Objects {
-    constructor(move, positionX, positionY, width, height) {
+    constructor(canMove, positionX, positionY, width, height, gameWidth) {
         this.position = {x:positionX, y:positionY};
         this.gameWidth = gameWidth;
         this.right = false;
@@ -11,7 +10,7 @@ class Objects {
         this.down = false;
         this.width = width;
         this.height = height;
-        this.move = move;
+        this.canMove = canMove;
         this.movement = {
             horizontal: false,
             vertical: false
