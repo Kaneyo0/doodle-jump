@@ -1,9 +1,13 @@
 const verticalMovement = 200;
+const baseVelocity = 18;
+const baseGravity = 0.7;
 
 class Objects {
     constructor(canMove, positionX, positionY, width, height, gameWidth) {
         this.position = {x:positionX, y:positionY};
         this.gameWidth = gameWidth;
+        this.velocity = baseVelocity;
+        this.gravity = baseGravity;
         this.right = false;
         this.left = false;
         this.up = false;
@@ -49,6 +53,11 @@ class Objects {
             this.up = true;
             this.down = false;
         }
+    }
+
+    beginFall() {
+        this.position.y += this.velocity;
+        this.velocity += this.gravity;
     }
 }
 

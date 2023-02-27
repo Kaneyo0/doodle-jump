@@ -1,0 +1,11 @@
+.doodler {
+    z-index: 1;
+}
+
+.power_up {
+    z-index: 2;
+}
+
+.doodler, .platform, .monster, .power_up{
+    position: absolute;
+}

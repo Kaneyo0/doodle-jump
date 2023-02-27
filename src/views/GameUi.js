@@ -5,6 +5,10 @@ import PowerUp from "../models/PowerUp.js";
 class GameUi {
     main = document.querySelector('.main');
     templates = document.querySelector('.template').content;
+    baseMenu = this.templates.cloneNode(true).querySelector('.menuBase');
+    pauseMenu = this.templates.cloneNode(true).querySelector('.pauseMenuContent');
+    loseMenu = this.templates.cloneNode(true).querySelector('.loseMenuContent');
+    startMenu = this.templates.cloneNode(true).querySelector('.startMenuContent');
 
     constructor(game, map_width) {
         this.main.style.width = map_width + "px";
@@ -26,13 +30,14 @@ class GameUi {
     initEventsHandlers() {
         document.addEventListener('keydown', (ev)=>{this.emitEvent(ev)}, false);
         document.addEventListener('keyup', (ev)=>{this.emitEvent(ev)}, false);
+        document.addEventListener('click', (ev)=>{this.emitEvent(ev)}, false);
     }
 
     emitEvent(event) {
         this.game.receiveEvent(event);
     }
     
-    initUi() {
+    initDoodler() {
         this.doodlerElem = this.templates.cloneNode(true).querySelector('.doodler');
         this.doodlerElem.style.width = this.game.doodler.width + 'px';
         this.doodlerElem.style.height = this.game.doodler.height + 'px';
@@ -61,6 +66,28 @@ class GameUi {
         }
     }
 
+    toggleMenu({ isStarted, isPaused, isOver }) {
+        if (isStarted) {
+            switch (true) {
+                case isOver:
+                    this.main.append(this.baseMenu);
+                    document.querySelector('.menuPicture').src = "./public/assets/hud/you-lose.png";
+                    document.querySelector('.mainMenu').append(this.loseMenu);
+                    break;
+                case isPaused:
+                    this.main.append(this.baseMenu);
+                    document.querySelector('.mainMenu').append(this.pauseMenu);
+                    break;
+                default:
+                    document.querySelector('.menuContent').remove();
+                    this.baseMenu.remove();
+            }
+        } else {
+            this.main.append(this.baseMenu);
+            document.querySelector('.mainMenu').append(this.startMenu);
+        }
+    }
+
     createObject(object) {
         let elemTabs = this.getElementTabs(object.constructor);
         let newElement;
@@ -74,7 +101,6 @@ class GameUi {
         newElement.src = object.skin;
         newElement.dataset.idData = object.id;
         newElement.style.height = object.height + 'px';
-        newElement.style.transform = `translate(${object.position.x}px, ${object.position.y}px)`;
         
         elemTabs.active.push(newElement);
         this.main.append(newElement);

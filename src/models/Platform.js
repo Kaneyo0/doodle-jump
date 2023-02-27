@@ -1,10 +1,10 @@
 import Objects from './Objects.js';
 
-const height = 20;
+const height = 18;
 const width = height * 3.83;
 const baseVelocity = 18;
 const chanceToMove = 20;
-const chanceToBroke = 10;
+const chanceToBroke = 5;
 const skinChoice = {
     green:'../../public/assets/environment/green-platform.png', 
     blue:'../../public/assets/environment/blue-platform.png',
@@ -20,8 +20,6 @@ class Platform extends Objects {
         this.broken = false;
         this.falling = false;
         this.movementSpeed = 3;
-        this.velocity = baseVelocity;
-        this.gravity = 0.7;
         this.init();
     }
 
@@ -73,11 +71,6 @@ class Platform extends Objects {
             if (this.movement.horizontal) this.horizontalMove();
             if (this.movement.vertical) this.verticalMove();
         } 
-    }
-
-    beginFall() {
-        this.position.y += this.velocity;
-        this.velocity += this.gravity;
     }
 }
 

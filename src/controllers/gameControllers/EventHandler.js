@@ -11,6 +11,9 @@ class EventHandler {
             case 'keyup':
                 this.handleKeyReleased(event.keyCode);
                 break;
+            case 'click':
+                this.handleClick(event.target.classList);
+                break
             default:
                 console.error('Error: event ' + event.type + 'is not supported');
         }
@@ -26,9 +29,9 @@ class EventHandler {
             case 68: 
                 this.game.startDoodlerMovement(true, 'right');
                 break;
-            case 90:
-                this.game.getDoodler().initJump();
-                break;   
+            // case 90:
+            //     this.game.getDoodler().initJump();
+            //     break;   
         }
     }
 
@@ -42,11 +45,25 @@ class EventHandler {
             case 68: 
                 this.game.stopDoodlerMovement(true);
                 break;
-            case 82:
-                this.game.restartGame();
-                break;
             case 27:
                 this.game.togglePause();
+                break;
+        }
+    }
+
+    handleClick(classList) {
+        switch(true) {
+            case classList.contains('play'):
+                this.game.start();
+                break;
+            case classList.contains('resume'):
+                this.game.togglePause();
+                break;
+            case classList.contains('restart'):
+                this.game.restart();
+                break;
+            case classList.contains('quit'):
+                window.close();
                 break;
         }
     }

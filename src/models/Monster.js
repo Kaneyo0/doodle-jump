@@ -1,8 +1,7 @@
 import Objects from "./Objects.js";
 
 const height = 40;
-const width = height * 3.83;
-const baseVelocity = 18;
+const width = height * 1.69;
 const yPosition = -200;
 const chanceToMove = 20;
 
@@ -13,8 +12,6 @@ class Monster extends Objects {
         this.skin = '../../public/assets/monsters/monster_1.png';
         this.id = id;
         this.movementSpeed = 3;
-        this.velocity = baseVelocity;
-        this.gravity = 0.7;
         this.init();
     }
 

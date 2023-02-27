@@ -12,13 +12,18 @@ const gameWidth = 1000;
 const nbPlatforms = 40;
 const nbMonsters = 5;
 const platformBaseYPosition = window.innerHeight - 100;
-const spaceBetweenPlatforms = 100;
-const chanceMonsterAppear = 20;
-const chanceToPowerUp = 30;
+const spaceBetweenPlatforms = 80;
+const distanceBeforeRecycling = 50;
+const chanceMonsterAppear = 10;
+const chanceToPowerUp = 20;
 
 class Game {
     constructor() {
-        this.isPaused = false;
+        this.statut = {
+            isStarted: false,
+            isPaused: true,
+            isOver: false
+        }
         this.Map = new Map(gameWidth);
         this.GameUi = new GameUi(this, this.Map.width);
         this.EventHandler = new EventHandler(this);
@@ -42,7 +47,7 @@ class Game {
         this.startEffect;
 
         this.game = function() {
-            if (!this.isPaused) {
+            if (!this.statut.isPaused) {
                 this.createGameElements();
                 this.moveGameElements();
                 this.controlGameElements();
@@ -50,8 +55,28 @@ class Game {
             window.requestAnimationFrame(() => { this.game() });
         }
         
-        this.GameUi.initUi();
+        this.GameUi.toggleMenu(this.statut);
+    }
+
+    start() {
+        this.GameUi.initDoodler();
+        this.statut.isStarted = true;
+        this.statut.isPaused = false;
+        this.GameUi.toggleMenu(this.statut);
         window.requestAnimationFrame(() => { this.game() });
+    }
+
+    restart() {
+        location.reload();
+        // this.getAllElements().forEach(element => {
+        //     element.position.y = window.innerHeight + distanceBeforeRecycling;
+        //     this.recycleObject(element);
+        // });
+        // this.createGameElements();
+        // this.statut.isOver = false;
+        // this.statut.isPaused = false;
+        // this.doodler.respawn();
+        // this.GameUi.toggleMenu(this.statut);
     }
 
     getDoodler() {
@@ -85,12 +110,8 @@ class Game {
     }
 
     togglePause() {
-        this.isPaused = !this.isPaused;
-    }
-
-    restartGame() {
-        this.doodler = new Doodler(gameWidth);
-        this.isPaused = false;
+        this.statut.isPaused = !this.statut.isPaused;
+        this.GameUi.toggleMenu(this.statut);
     }
 
     createGameElements() {
@@ -119,9 +140,11 @@ class Game {
     }
 
     controlActiveEffect() {
+        console.log(this.activeEffect);
         if (this.activeEffect && Date.now() - this.startEffect >= this.timeEffect) {
             this.activeEffect = false;
             this.doodler.reset();
+            console.log('effect disabled');
         }
     }
 
@@ -140,17 +163,21 @@ class Game {
                 case Platform:
                     if (!object.broken) {
                         if (!this.doodler.isJumping()) this.doodler.initJump();
-                    } else {
-                        object.falling = true;
-                    }
+                    } else object.falling = true;
                     break;
                 case Monster:
-                    object.skin = '';
-                    this.doodler.isJumping() ? this.endGame() : this.doodler.initJump();
+                    if (this.doodler.isJumping() && !this.doodler.isInvulnerable) this.endGame() 
+                    else {
+                        this.doodler.initJump();
+                        object.position.y = window.innerHeight;
+                    }
                     break;
                 case PowerUp:
-                    this.applyEffect(object.effect);
-                    // if (!object.effect.jump) this.recycleObject(object);
+                    if (!object.used) {
+                        if (!object.effect.jump) object.equipped = true;
+                        object.used = true;
+                        this.applyEffect(object.effect);
+                    }
                     break;
                 default:
                     console.log(`Unknown ${constructor} element`);
@@ -165,11 +192,10 @@ class Game {
 
         if (elemTabs.inactive.length > 0) {
             newObject = elemTabs.inactive.shift();
+            if (constructor == Monster) newObject.reset();
             if (constructor == PowerUp) newObject.reset(x, y);
             if (constructor == Platform) newObject.reset(this.platformYPosition);
-        } else {
-            newObject = new constructor(this.objectQuantity ,x, y);
-        }
+        } else newObject = new constructor(this.objectQuantity ,x, y);
 
         this.objectQuantity++;
 
@@ -180,7 +206,8 @@ class Game {
                     if (this.activeMonsters.length < nbMonsters) this.createObject(Monster, gameWidth, this.platformYPosition);
                     break;
                 case random <= chanceToPowerUp:
-                    if (!newObject.broken && !newObject.canMove) this.createObject(PowerUp, newObject.position.x + (newObject.width/3), newObject.position.y);
+                    if (!newObject.broken && !newObject.canMove) this.createObject(PowerUp, 
+                        newObject.position.x + (newObject.width/3), newObject.position.y);
                     break;
             }
         }
@@ -192,6 +219,15 @@ class Game {
     moveEnvironment() {
         this.getAllElements().forEach(gameElement => { 
             if (gameElement.constructor != PowerUp) gameElement.refreshMove();
+            else if (gameElement.equipped) {
+                if (!this.activeEffect) {
+                    gameElement.equipped = false;
+                    gameElement.beginFall();
+                } else {
+                    gameElement.position.x = this.doodler.position.x - gameElement.width/3;
+                    gameElement.position.y = this.doodler.position.y - gameElement.height/2;
+                }
+            }
         });
     }
 
@@ -208,7 +244,8 @@ class Game {
         if (this.activePlatforms.length > 0) {
             for (let index = this.activePlatforms.length - 1; index > 0; index--) {
                 if (!this.activePlatforms[index].broken) {
-                    if (this.activePlatforms[this.activePlatforms.length - 1].position.y >= this.platformYPosition + spaceBetweenPlatforms) return true;
+                    if (this.activePlatforms[this.activePlatforms.length - 1].position.y >= 
+                        this.platformYPosition + spaceBetweenPlatforms) return true;
                     return false;
                 }
             }
@@ -226,15 +263,16 @@ class Game {
 
     testObjectsPosition() {
         this.getAllElements().forEach(gameElement => {
-            if (gameElement.position.y > window.innerHeight + gameElement.height) this.recycleObject(gameElement);
+            if (gameElement.position.y > window.innerHeight + distanceBeforeRecycling) this.recycleObject(gameElement);
         });
 
-        if (this.doodler.position.y > window.innerHeight + 200) this.endGame();
+        if (this.doodler.position.y > window.innerHeight + distanceBeforeRecycling) this.endGame();
     }
 
     endGame() {
-        this.isPaused = true;
-        console.log('Game Over');
+        this.statut.isPaused = true;
+        this.statut.isOver = true;
+        this.GameUi.toggleMenu(this.statut);
     }
 }
 

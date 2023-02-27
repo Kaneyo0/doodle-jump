@@ -1,6 +1,6 @@
 import Objects from './Objects.js';
 
-const doodlerSize = 60;
+const doodlerSize = 50;
 const baseMovementSpeed = 12;
 const baseVelocity = 18;
 const baseGravity = 0.7;
@@ -10,15 +10,21 @@ class Doodle extends Objects {
         super(true, (gameWidth/2) - (doodlerSize / 2), window.innerHeight - doodlerSize, doodlerSize, doodlerSize, gameWidth);
         this.skin = {left:'../../public/assets/doodler/lik-left.png', right:'../../public/assets/doodler/lik-right.png'};
         this.canTouch = true;
+        this.isInvulnerable = false;
         this.direction = 'left';
         this.movementSpeed = baseMovementSpeed;
-        this.velocity = baseVelocity;
-        this.gravity = baseGravity;
+    }
+
+    respawn() {
+        this.position.y = window.innerHeight/2;
+        this.position.x = this.gameWidth/2;
+        this.reset();
     }
 
     reset() {
         this.gravity = baseGravity;
         this.canTouch = true;
+        this.isInvulnerable = false;
     }
 
     initJump() {
@@ -48,11 +54,12 @@ class Doodle extends Objects {
         this.horizontalMove();
     }
 
-    applyEffect({ gravityMultiplicator, velocityMultiplicator, jump }) {
+    applyEffect({ gravityMultiplicator, velocityMultiplicator, jump, canTouch, invulnerability }) {
         if(jump) this.initJump();
         this.gravity = baseGravity * gravityMultiplicator;
         this.velocity = baseVelocity * velocityMultiplicator;
-        this.canTouch = false;
+        this.canTouch = canTouch;
+        this.isInvulnerable = invulnerability;
     }
 }
 
