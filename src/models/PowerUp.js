@@ -8,12 +8,12 @@ const trampoline = 'trampoline';
 const invulnerability = 'invulnerability';
 const types = [helicopter, jetpack, spring, trampoline, rocket, invulnerability];
 const skinChoice = {
-    helicopter:'../../public/assets/power_up/helicopter.png', 
-    jetpack:'../../public/assets/power_up/jetpack.png',
-    rocket:'../../public/assets/power_up/rocket.png',
-    spring:'../../public/assets/power_up/spring.png',
-    trampoline:'../../public/assets/power_up/trampoline.png',
-    invulnerability:'../../public/assets/power_up/invulnerability.png'
+    helicopter:'../../public/assets/power_up/helicopter.webp', 
+    jetpack:'../../public/assets/power_up/jetpack.webp',
+    rocket:'../../public/assets/power_up/rocket.webp',
+    spring:'../../public/assets/power_up/spring.webp',
+    trampoline:'../../public/assets/power_up/trampoline.webp',
+    invulnerability:'../../public/assets/power_up/invulnerability.webp'
 };
 
 class PowerUp extends Objects {

@@ -14,6 +14,7 @@ const nbMonsters = 5;
 const platformBaseYPosition = window.innerHeight - 100;
 const spaceBetweenPlatforms = 80;
 const distanceBeforeRecycling = 50;
+const distanceBeforeMoveScreen = window.innerHeight/3;
 const chanceMonsterAppear = 10;
 const chanceToPowerUp = 20;
 
@@ -31,6 +32,7 @@ class Game {
         this.MovementController = new MovementController();
         this.doodler = new Doodler(gameWidth);
         this.objectQuantity = 0;
+        this.score = 0;
 
         this.activePlatforms = [];
         this.inactivePlatforms = [];
@@ -140,17 +142,16 @@ class Game {
     }
 
     controlActiveEffect() {
-        console.log(this.activeEffect);
         if (this.activeEffect && Date.now() - this.startEffect >= this.timeEffect) {
             this.activeEffect = false;
             this.doodler.reset();
-            console.log('effect disabled');
         }
     }
 
     controlScreenPosition() {
-        if (this.doodler.position.y < window.innerHeight / 3 && this.doodler.isJumping()) {
+        if (this.doodler.position.y < distanceBeforeMoveScreen && this.doodler.isJumping()) {
             this.doodler.canMove = false;
+            this.score += this.doodler.velocity
             this.getAllElements().forEach(element => { element.position.y += this.doodler.velocity });
         }
     }

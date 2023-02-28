@@ -4,6 +4,8 @@ import PowerUp from "../models/PowerUp.js";
 
 class GameUi {
     main = document.querySelector('.main');
+    scoreUi = document.querySelector('.scoreUi');
+    score = document.querySelector('.score');
     templates = document.querySelector('.template').content;
     baseMenu = this.templates.cloneNode(true).querySelector('.menuBase');
     pauseMenu = this.templates.cloneNode(true).querySelector('.pauseMenuContent');
@@ -11,7 +13,8 @@ class GameUi {
     startMenu = this.templates.cloneNode(true).querySelector('.startMenuContent');
 
     constructor(game, map_width) {
-        this.main.style.width = map_width + "px";
+        this.gameWidth = map_width + "px";
+        this.main.style.width = this.gameWidth;
         this.game = game;
 
         this.activePlatforms = [];
@@ -38,6 +41,7 @@ class GameUi {
     }
     
     initDoodler() {
+        this.scoreUi.style.transform = `translate(${this.gameWidth}px, 0px)`;
         this.doodlerElem = this.templates.cloneNode(true).querySelector('.doodler');
         this.doodlerElem.style.width = this.game.doodler.width + 'px';
         this.doodlerElem.style.height = this.game.doodler.height + 'px';
@@ -71,7 +75,7 @@ class GameUi {
             switch (true) {
                 case isOver:
                     this.main.append(this.baseMenu);
-                    document.querySelector('.menuPicture').src = "./public/assets/hud/you-lose.png";
+                    document.querySelector('.menuPicture').src = "./public/assets/hud/you-lose.webp";
                     document.querySelector('.mainMenu').append(this.loseMenu);
                     break;
                 case isPaused:
@@ -132,6 +136,8 @@ class GameUi {
             let objectData = this.game.getObjectData(uiElement.dataset.idData);
             uiElement.style.transform = `translate(${objectData.position.x}px, ${objectData.position.y}px)`;
         });
+
+        this.score.innerHTML = Math.floor(this.game.score);
     }
 
     refreshGameUi() {

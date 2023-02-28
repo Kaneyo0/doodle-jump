@@ -8,7 +8,7 @@ const baseGravity = 0.7;
 class Doodle extends Objects {
     constructor(gameWidth) {
         super(true, (gameWidth/2) - (doodlerSize / 2), window.innerHeight - doodlerSize, doodlerSize, doodlerSize, gameWidth);
-        this.skin = {left:'../../public/assets/doodler/lik-left.png', right:'../../public/assets/doodler/lik-right.png'};
+        this.skin = {left:'../../public/assets/doodler/doodler-left.webp', right:'../../public/assets/doodler/doodler-right.webp'};
         this.canTouch = true;
         this.isInvulnerable = false;
         this.direction = 'left';

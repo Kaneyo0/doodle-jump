@@ -9,7 +9,7 @@ class Monster extends Objects {
 
     constructor(id, gameWidth) {
         super(false, Math.floor(Math.random() * (gameWidth - width)), yPosition, width, height, gameWidth);
-        this.skin = '../../public/assets/monsters/monster_1.png';
+        this.skin = '../../public/assets/monsters/monster_1.webp';
         this.id = id;
         this.movementSpeed = 3;
         this.init();

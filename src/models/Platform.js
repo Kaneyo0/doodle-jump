@@ -6,9 +6,9 @@ const baseVelocity = 18;
 const chanceToMove = 20;
 const chanceToBroke = 5;
 const skinChoice = {
-    green:'../../public/assets/environment/green-platform.png', 
-    blue:'../../public/assets/environment/blue-platform.png',
-    broken:'../../public/assets/environment/broken-platform_1.png'
+    green:'../../public/assets/environment/green-platform.webp', 
+    blue:'../../public/assets/environment/blue-platform.webp',
+    broken:'../../public/assets/environment/broken-platform_1.webp'
 };
 
 class Platform extends Objects {
