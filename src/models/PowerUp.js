@@ -1,19 +1,19 @@
-import Objects from './Objects.js';
+import Objects from "./Objects.js";
 
-const helicopter = 'helicopter';
-const jetpack = 'jetpack';
-const rocket = 'rocket';
-const spring = 'spring';
-const trampoline = 'trampoline';
-const invulnerability = 'invulnerability';
+const helicopter = "helicopter";
+const jetpack = "jetpack";
+const rocket = "rocket";
+const spring = "spring";
+const trampoline = "trampoline";
+const invulnerability = "invulnerability";
 const types = [helicopter, jetpack, spring, trampoline, rocket, invulnerability];
 const skinChoice = {
-    helicopter:'../../public/assets/power_up/helicopter.webp', 
-    jetpack:'../../public/assets/power_up/jetpack.webp',
-    rocket:'../../public/assets/power_up/rocket.webp',
-    spring:'../../public/assets/power_up/spring.webp',
-    trampoline:'../../public/assets/power_up/trampoline.webp',
-    invulnerability:'../../public/assets/power_up/invulnerability.webp'
+    helicopter: "../../public/assets/power_up/helicopter.webp",
+    jetpack: "../../public/assets/power_up/jetpack.webp",
+    rocket: "../../public/assets/power_up/rocket.webp",
+    spring: "../../public/assets/power_up/spring.webp",
+    trampoline: "../../public/assets/power_up/trampoline.webp",
+    invulnerability: "../../public/assets/power_up/invulnerability.webp",
 };
 
 class PowerUp extends Objects {
@@ -29,7 +29,7 @@ class PowerUp extends Objects {
     }
 
     init() {
-        let random = Math.random()*types.length | 0;
+        let random = (Math.random() * types.length) | 0;
         this.type = types[random];
 
         switch (this.type) {
@@ -40,8 +40,8 @@ class PowerUp extends Objects {
                     jump: false,
                     canTouch: false,
                     invulnerability: false,
-                    time: 2000
-                }
+                    time: 2000,
+                };
 
                 this.skin = skinChoice.helicopter;
                 this.height = 20;
@@ -54,8 +54,8 @@ class PowerUp extends Objects {
                     jump: false,
                     canTouch: false,
                     invulnerability: false,
-                    time: 4000
-                }
+                    time: 4000,
+                };
 
                 this.skin = skinChoice.jetpack;
                 this.height = 40;
@@ -68,8 +68,8 @@ class PowerUp extends Objects {
                     jump: false,
                     canTouch: false,
                     invulnerability: false,
-                    time: 6000
-                }
+                    time: 6000,
+                };
 
                 this.skin = skinChoice.rocket;
                 this.height = 100;
@@ -82,8 +82,8 @@ class PowerUp extends Objects {
                     jump: true,
                     canTouch: false,
                     invulnerability: false,
-                    time: 0
-                }
+                    time: 0,
+                };
 
                 this.skin = skinChoice.spring;
                 this.height = 20;
@@ -96,8 +96,8 @@ class PowerUp extends Objects {
                     jump: true,
                     canTouch: false,
                     invulnerability: false,
-                    time: 0
-                }
+                    time: 0,
+                };
 
                 this.skin = skinChoice.trampoline;
                 this.height = 20;
@@ -110,8 +110,8 @@ class PowerUp extends Objects {
                     jump: false,
                     canTouch: true,
                     invulnerability: true,
-                    time: 15000
-                }
+                    time: 15000,
+                };
 
                 this.skin = skinChoice.invulnerability;
                 this.height = 40;

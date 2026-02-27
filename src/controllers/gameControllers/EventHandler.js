@@ -4,45 +4,45 @@ class EventHandler {
     }
 
     handleEvent(event) {
-        switch(event.type) {
-            case 'keydown':
+        switch (event.type) {
+            case "keydown":
                 this.handleKeyPressed(event.keyCode);
                 break;
-            case 'keyup':
+            case "keyup":
                 this.handleKeyReleased(event.keyCode);
                 break;
-            case 'click':
+            case "click":
                 this.handleClick(event.target.classList);
-                break
+                break;
             default:
-                console.error('Error: event ' + event.type + 'is not supported');
+                console.error("Error: event " + event.type + "is not supported");
         }
     }
 
     handleKeyPressed(keyPressed) {
-        switch(keyPressed) {
+        switch (keyPressed) {
             case 37:
-            case 81: 
-                this.game.startDoodlerMovement(false, 'left');
+            case 81:
+                this.game.startDoodlerMovement(false, "left");
                 break;
             case 39:
-            case 68: 
-                this.game.startDoodlerMovement(true, 'right');
+            case 68:
+                this.game.startDoodlerMovement(true, "right");
                 break;
             // case 90:
             //     this.game.getDoodler().initJump();
-            //     break;   
+            //     break;
         }
     }
 
     handleKeyReleased(keyLeft) {
-        switch(keyLeft) {
+        switch (keyLeft) {
             case 37:
-            case 81: 
+            case 81:
                 this.game.stopDoodlerMovement(false);
                 break;
             case 39:
-            case 68: 
+            case 68:
                 this.game.stopDoodlerMovement(true);
                 break;
             case 27:
@@ -52,17 +52,17 @@ class EventHandler {
     }
 
     handleClick(classList) {
-        switch(true) {
-            case classList.contains('play'):
+        switch (true) {
+            case classList.contains("play"):
                 this.game.start();
                 break;
-            case classList.contains('resume'):
+            case classList.contains("resume"):
                 this.game.togglePause();
                 break;
-            case classList.contains('restart'):
+            case classList.contains("restart"):
                 this.game.restart();
                 break;
-            case classList.contains('quit'):
+            case classList.contains("quit"):
                 window.close();
                 break;
         }

@@ -6,10 +6,9 @@ const yPosition = -200;
 const chanceToMove = 20;
 
 class Monster extends Objects {
-
     constructor(id, gameWidth) {
         super(false, Math.floor(Math.random() * (gameWidth - width)), yPosition, width, height, gameWidth);
-        this.skin = '../../public/assets/monsters/monster_1.webp';
+        this.skin = "../../public/assets/monsters/monster_1.webp";
         this.id = id;
         this.movementSpeed = 3;
         this.init();
@@ -50,7 +49,7 @@ class Monster extends Objects {
         if (this.canMove) {
             if (this.movement.horizontal) this.horizontalMove();
             if (this.movement.vertical) this.verticalMove();
-        } 
+        }
     }
 }
 

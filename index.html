@@ -1,21 +1,19 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="Doodle Jump game developped by Tom DUCHESNE in Javascript">
-        <link rel="stylesheet" href="./public/css/style.css">
-        <link rel="icon" href="./public/assets/hud/favicon.webp">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Shantell+Sans&display=swap" rel="stylesheet">
-        <title> Doodle Jump </title>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Doodle Jump game developped by Tom DUCHESNE in Javascript" />
+        <link rel="stylesheet" href="./public/css/style.css" />
+        <link rel="icon" href="./public/assets/hud/favicon.webp" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Shantell+Sans&display=swap" rel="stylesheet" />
+        <title>Doodle Jump</title>
     </head>
     <body>
-        <header class="header">
-            
-        </header>
+        <header class="header"></header>
         <main class="main">
             <p class="scoreUi">SCORE: <span class="score">0</span></p>
             <!-- The game will happen here -->
@@ -23,29 +21,29 @@
 
         <!-- Templates of rendered elements -->
         <template class="template">
-            <img src="" alt="platform image" class="platform">
-            <img src="" alt="doodler image" class="doodler">
-            <img src="" alt="monster image" class="monster">
-            <img src="" alt="power up image" class="power_up">
+            <img src="" alt="platform image" class="platform" />
+            <img src="" alt="doodler image" class="doodler" />
+            <img src="" alt="monster image" class="monster" />
+            <img src="" alt="power up image" class="power_up" />
             <article class="menuBase">
                 <div class="mainMenu">
-                    <img class="menuPicture" src="./public/assets/hud/game-title.webp" alt="menu picture">
+                    <img class="menuPicture" src="./public/assets/hud/game-title.webp" alt="menu picture" />
                     <h1 class="menuTitle"></h1>
                     <!-- Menu content -->
                 </div>
             </article>
             <div class="menuContent pauseMenuContent">
-                <p class="menuButton resume"> Resume </p>
-                <p class="menuButton restart"> Restart </p>
-                <p class="menuButton quit"> Quit </p>
+                <p class="menuButton resume">Resume</p>
+                <p class="menuButton restart">Restart</p>
+                <p class="menuButton quit">Quit</p>
             </div>
             <div class="menuContent startMenuContent">
-                <p class="menuButton play"> Play </p>
-                <p class="menuButton quit"> Quit </p>
+                <p class="menuButton play">Play</p>
+                <p class="menuButton quit">Quit</p>
             </div>
             <div class="menuContent loseMenuContent">
-                <p class="menuButton restart"> Play again </p>
-                <p class="menuButton quit"> Quit </p>
+                <p class="menuButton restart">Play again</p>
+                <p class="menuButton quit">Quit</p>
             </div>
         </template>
 

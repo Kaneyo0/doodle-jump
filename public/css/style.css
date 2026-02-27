@@ -3,7 +3,7 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 /* Remove default margin */
@@ -17,37 +17,37 @@ figure,
 blockquote,
 dl,
 dd {
-  margin: 0;
+    margin: 0;
 }
 
 /* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
-ul[role=list],
-ol[role=list] {
-  list-style: none;
+ul[role="list"],
+ol[role="list"] {
+    list-style: none;
 }
 
 /* Set core root defaults */
 html:focus-within {
-  scroll-behavior: smooth;
+    scroll-behavior: smooth;
 }
 
 /* Set core body defaults */
 body {
-  min-height: 100vh;
-  text-rendering: optimizeSpeed;
-  line-height: 1.5;
+    min-height: 100vh;
+    text-rendering: optimizeSpeed;
+    line-height: 1.5;
 }
 
 /* A elements that don't have a class get default styles */
 a:not([class]) {
-  text-decoration-skip-ink: auto;
+    text-decoration-skip-ink: auto;
 }
 
 /* Make images easier to work with */
 img,
 picture {
-  max-width: 100%;
-  display: block;
+    max-width: 100%;
+    display: block;
 }
 
 /* Inherit fonts for inputs and buttons */
@@ -55,124 +55,128 @@ input,
 button,
 textarea,
 select {
-  font: inherit;
+    font: inherit;
 }
 
 /* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
 @media (prefers-reduced-motion: reduce) {
-  html:focus-within {
-    scroll-behavior: auto;
-  }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+    html:focus-within {
+        scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 :root {
-  --game-width: 750px;
-  --game-background: url("../../public/assets/map/map-base.webp");
+    --game-width: 750px;
+    --game-background: url("../../public/assets/map/map-base.webp");
 }
 
 body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: black;
-  font-family: "Shantell Sans";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    font-family: "Shantell Sans";
 }
 
 .main {
-  position: relative;
-  background-image: var(--game-background);
-  min-height: 100vh;
-  overflow: hidden;
+    position: relative;
+    background-image: var(--game-background);
+    min-height: 100vh;
+    overflow: hidden;
 }
 
 .doodler {
-  z-index: 1;
+    z-index: 1;
 }
 
 .power_up {
-  z-index: 2;
+    z-index: 2;
 }
 
-.doodler, .platform, .monster, .power_up {
-  position: absolute;
+.doodler,
+.platform,
+.monster,
+.power_up {
+    position: absolute;
 }
 
-.header, .scoreUi {
-  position: absolute;
+.header,
+.scoreUi {
+    position: absolute;
 }
 
 .menuBase {
-  z-index: 50;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(131, 131, 131, 0.542);
-  position: relative;
+    z-index: 50;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(131, 131, 131, 0.542);
+    position: relative;
 }
 
 .mainMenu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 30rem;
-  height: 38rem;
-  padding: 2rem 0;
-  background-image: url("../../public/assets/hud/menu-background.webp");
-  background-position: center;
-  border: 2px black solid;
-  border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30rem;
+    height: 38rem;
+    padding: 2rem 0;
+    background-image: url("../../public/assets/hud/menu-background.webp");
+    background-position: center;
+    border: 2px black solid;
+    border-radius: 10px;
 }
 
 .mainMenu .gameTitle {
-  height: 30%;
+    height: 30%;
 }
 
 .menuPicture {
-  width: 80%;
+    width: 80%;
 }
 
 .menuContent {
-  text-align: center;
-  height: 70%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
+    text-align: center;
+    height: 70%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
 }
 
 .menuContent * {
-  font-size: 20px;
-  padding: 1rem 0;
+    font-size: 20px;
+    padding: 1rem 0;
 }
 
 .menuContent .menuButton:hover {
-  background-color: rgb(223, 146, 146);
-  color: rgb(225, 31, 31);
+    background-color: rgb(223, 146, 146);
+    color: rgb(225, 31, 31);
 }
 
 .menuContent .menuButton:active {
-  background-color: rgb(74, 3, 3);
-  color: rgb(225, 31, 31);
+    background-color: rgb(74, 3, 3);
+    color: rgb(225, 31, 31);
 }
 
 .menuButton {
-  cursor: pointer;
-  width: 40%;
-  margin-right: auto;
-  margin-left: auto;
-  background-color: rgb(222, 202, 202);
-  border-radius: 50px;
-  border: 3px solid rgb(255, 204, 0);
+    cursor: pointer;
+    width: 40%;
+    margin-right: auto;
+    margin-left: auto;
+    background-color: rgb(222, 202, 202);
+    border-radius: 50px;
+    border: 3px solid rgb(255, 204, 0);
 }
 
 /*# sourceMappingURL=style.css.map */

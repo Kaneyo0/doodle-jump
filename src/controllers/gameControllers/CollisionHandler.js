@@ -10,7 +10,7 @@ class CollisionHandler {
         //     doodler.initJump();
         // }
 
-        this.game.getAllElements().forEach(element => {
+        this.game.getAllElements().forEach((element) => {
             if (this.doodlerIsTouchingObject(element)) {
                 this.game.doodlerIsTouching(element);
             }
@@ -20,10 +20,12 @@ class CollisionHandler {
     doodlerIsTouchingObject(object) {
         let doodler = this.game.getDoodler();
 
-        return  (doodler.position.y + doodler.height >= object.position.y && 
-                doodler.position.x + doodler.width >= object.position.x &&
-                object.position.y + object.height >= doodler.position.y &&
-                object.position.x + object.width >= doodler.position.x);
+        return (
+            doodler.position.y + doodler.height >= object.position.y &&
+            doodler.position.x + doodler.width >= object.position.x &&
+            object.position.y + object.height >= doodler.position.y &&
+            object.position.x + object.width >= doodler.position.x
+        );
     }
 }
 

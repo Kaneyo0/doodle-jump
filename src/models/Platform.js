@@ -1,4 +1,4 @@
-import Objects from './Objects.js';
+import Objects from "./Objects.js";
 
 const height = 18;
 const width = height * 3.83;
@@ -6,13 +6,12 @@ const baseVelocity = 18;
 const chanceToMove = 20;
 const chanceToBroke = 5;
 const skinChoice = {
-    green:'../../public/assets/environment/green-platform.webp', 
-    blue:'../../public/assets/environment/blue-platform.webp',
-    broken:'../../public/assets/environment/broken-platform_1.webp'
+    green: "../../public/assets/environment/green-platform.webp",
+    blue: "../../public/assets/environment/blue-platform.webp",
+    broken: "../../public/assets/environment/broken-platform_1.webp",
 };
 
 class Platform extends Objects {
-
     constructor(id, gameWidth, baseYPosition) {
         super(false, Math.floor(Math.random() * (gameWidth - width)), baseYPosition, width, height, gameWidth);
         this.skin = skinChoice.green;
@@ -25,7 +24,7 @@ class Platform extends Objects {
 
     init() {
         let random = Math.random() * 100;
-    
+
         switch (true) {
             case random <= chanceToBroke:
                 this.broken = true;
@@ -70,7 +69,7 @@ class Platform extends Objects {
         if (this.canMove) {
             if (this.movement.horizontal) this.horizontalMove();
             if (this.movement.vertical) this.verticalMove();
-        } 
+        }
     }
 }
 

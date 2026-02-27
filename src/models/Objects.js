@@ -4,7 +4,7 @@ const baseGravity = 0.7;
 
 class Objects {
     constructor(canMove, positionX, positionY, width, height, gameWidth) {
-        this.position = {x:positionX, y:positionY};
+        this.position = { x: positionX, y: positionY };
         this.gameWidth = gameWidth;
         this.velocity = baseVelocity;
         this.gravity = baseGravity;
@@ -17,8 +17,8 @@ class Objects {
         this.canMove = canMove;
         this.movement = {
             horizontal: false,
-            vertical: false
-        }
+            vertical: false,
+        };
         this.status;
         this.positionDifference = 0;
     }
@@ -44,7 +44,7 @@ class Objects {
         if (this.down) {
             this.position.y += this.movementSpeed;
             this.positionDifference += this.movementSpeed;
-        } 
+        }
         if (this.positionDifference <= -verticalMovement) {
             this.up = false;
             this.down = true;

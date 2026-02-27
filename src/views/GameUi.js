@@ -3,14 +3,14 @@ import Monster from "../models/Monster.js";
 import PowerUp from "../models/PowerUp.js";
 
 class GameUi {
-    main = document.querySelector('.main');
-    scoreUi = document.querySelector('.scoreUi');
-    score = document.querySelector('.score');
-    templates = document.querySelector('.template').content;
-    baseMenu = this.templates.cloneNode(true).querySelector('.menuBase');
-    pauseMenu = this.templates.cloneNode(true).querySelector('.pauseMenuContent');
-    loseMenu = this.templates.cloneNode(true).querySelector('.loseMenuContent');
-    startMenu = this.templates.cloneNode(true).querySelector('.startMenuContent');
+    main = document.querySelector(".main");
+    scoreUi = document.querySelector(".scoreUi");
+    score = document.querySelector(".score");
+    templates = document.querySelector(".template").content;
+    baseMenu = this.templates.cloneNode(true).querySelector(".menuBase");
+    pauseMenu = this.templates.cloneNode(true).querySelector(".pauseMenuContent");
+    loseMenu = this.templates.cloneNode(true).querySelector(".loseMenuContent");
+    startMenu = this.templates.cloneNode(true).querySelector(".startMenuContent");
 
     constructor(game, map_width) {
         this.gameWidth = map_width + "px";
@@ -31,20 +31,38 @@ class GameUi {
     }
 
     initEventsHandlers() {
-        document.addEventListener('keydown', (ev)=>{this.emitEvent(ev)}, false);
-        document.addEventListener('keyup', (ev)=>{this.emitEvent(ev)}, false);
-        document.addEventListener('click', (ev)=>{this.emitEvent(ev)}, false);
+        document.addEventListener(
+            "keydown",
+            (ev) => {
+                this.emitEvent(ev);
+            },
+            false,
+        );
+        document.addEventListener(
+            "keyup",
+            (ev) => {
+                this.emitEvent(ev);
+            },
+            false,
+        );
+        document.addEventListener(
+            "click",
+            (ev) => {
+                this.emitEvent(ev);
+            },
+            false,
+        );
     }
 
     emitEvent(event) {
         this.game.receiveEvent(event);
     }
-    
+
     initDoodler() {
         this.scoreUi.style.transform = `translate(${this.gameWidth}px, 0px)`;
-        this.doodlerElem = this.templates.cloneNode(true).querySelector('.doodler');
-        this.doodlerElem.style.width = this.game.doodler.width + 'px';
-        this.doodlerElem.style.height = this.game.doodler.height + 'px';
+        this.doodlerElem = this.templates.cloneNode(true).querySelector(".doodler");
+        this.doodlerElem.style.width = this.game.doodler.width + "px";
+        this.doodlerElem.style.height = this.game.doodler.height + "px";
         this.main.append(this.doodlerElem);
     }
 
@@ -53,20 +71,22 @@ class GameUi {
     }
 
     getObject(idObject) {
-        let result = this.getAllUiElements().filter(object => { return object.dataset.idData == idObject });
+        let result = this.getAllUiElements().filter((object) => {
+            return object.dataset.idData == idObject;
+        });
         return result[0];
     }
 
     getElementTabs(constructor) {
-        switch(constructor) {
-            case Platform: 
-                return {active: this.activePlatforms, inactive: this.inactivePlatforms, className: '.platform'}
+        switch (constructor) {
+            case Platform:
+                return { active: this.activePlatforms, inactive: this.inactivePlatforms, className: ".platform" };
             case Monster:
-                return {active: this.activeMonsters, inactive: this.inactiveMonsters, className: '.monster'}
+                return { active: this.activeMonsters, inactive: this.inactiveMonsters, className: ".monster" };
             case PowerUp:
-                return {active: this.activePowerUps, inactive: this.inactivePowerUps, className: '.power_up'}
+                return { active: this.activePowerUps, inactive: this.inactivePowerUps, className: ".power_up" };
             default:
-                console.log('Unknown game object');
+                console.log("Unknown game object");
         }
     }
 
@@ -75,20 +95,20 @@ class GameUi {
             switch (true) {
                 case isOver:
                     this.main.append(this.baseMenu);
-                    document.querySelector('.menuPicture').src = "./public/assets/hud/you-lose.webp";
-                    document.querySelector('.mainMenu').append(this.loseMenu);
+                    document.querySelector(".menuPicture").src = "./public/assets/hud/you-lose.webp";
+                    document.querySelector(".mainMenu").append(this.loseMenu);
                     break;
                 case isPaused:
                     this.main.append(this.baseMenu);
-                    document.querySelector('.mainMenu').append(this.pauseMenu);
+                    document.querySelector(".mainMenu").append(this.pauseMenu);
                     break;
                 default:
-                    document.querySelector('.menuContent').remove();
+                    document.querySelector(".menuContent").remove();
                     this.baseMenu.remove();
             }
         } else {
             this.main.append(this.baseMenu);
-            document.querySelector('.mainMenu').append(this.startMenu);
+            document.querySelector(".mainMenu").append(this.startMenu);
         }
     }
 
@@ -101,11 +121,11 @@ class GameUi {
         } else {
             newElement = this.templates.cloneNode(true).querySelector(elemTabs.className);
         }
-        
+
         newElement.src = object.skin;
         newElement.dataset.idData = object.id;
-        newElement.style.height = object.height + 'px';
-        
+        newElement.style.height = object.height + "px";
+
         elemTabs.active.push(newElement);
         this.main.append(newElement);
     }
@@ -119,11 +139,11 @@ class GameUi {
     }
 
     refreshDoodler() {
-        switch(this.game.doodler.direction) {
-            case 'left': 
+        switch (this.game.doodler.direction) {
+            case "left":
                 this.doodlerElem.src = `${this.game.doodler.skin.left}`;
                 break;
-            case 'right': 
+            case "right":
                 this.doodlerElem.src = `${this.game.doodler.skin.right}`;
                 break;
         }
@@ -132,7 +152,7 @@ class GameUi {
     }
 
     refreshElements() {
-        this.getAllUiElements().forEach(uiElement => {
+        this.getAllUiElements().forEach((uiElement) => {
             let objectData = this.game.getObjectData(uiElement.dataset.idData);
             uiElement.style.transform = `translate(${objectData.position.x}px, ${objectData.position.y}px)`;
         });
