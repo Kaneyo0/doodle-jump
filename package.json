@@ -4,11 +4,16 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "sass:w": "sass --watch sass/main.scss:public/css/style.css"
+        "sass:w": "sass --watch sass/main.scss:public/css/style.css",
+        "start": "live-server"
     },
     "author": "Kaneyo",
     "license": "ISC",
     "dependencies": {
-        "sass": "^1.57.1"
+        "sass": "^1.57.1",
+        "typescript": "^5.9.3"
+    },
+    "devDependencies": {
+        "live-server": "^1.2.2"
     }
 }
